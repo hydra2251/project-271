@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:project271/screens/signin.dart';
-import 'package:project271/screens/signinnurse.dart'; // Import SignInClientPage
+import 'package:project271/screens/signup_user.dart';
+import 'package:project271/screens/signup_nurse.dart';
+import 'package:project271/screens/login.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,54 +17,71 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ClientNursePage(),
+      home: const ClientNursePage(),
     );
   }
 }
 
 class ClientNursePage extends StatelessWidget {
+  const ClientNursePage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: rgbaColor(233, 243, 245, 1), // Set background color
+      backgroundColor: rgbaColor(233, 243, 245, 1),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'lib/assets/nursesicon.png', // Replace 'assets/camera_icon.png' with your image asset path
+              'lib/assets/nursesicon.png',
               width: 200,
               height: 200,
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
-                // Navigate to SignInPage when Client button is pressed
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignInPage()),
+                  MaterialPageRoute(builder: (context) => const SignInPage()),
                 );
               },
               style: ElevatedButton.styleFrom(
-                primary: rgbaColor(233, 243, 245, 1), // Set button color using RGBA values
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20), // Adjust button padding
+                backgroundColor: rgbaColor(233, 243, 245, 1),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
               ),
-              child: Text('Client'),
+              child: const Text('Client'),
             ),
-            SizedBox(height: 10), // Add spacing between buttons
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                // Navigate to SignInClientPage when Nurse button is pressed
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NursePage()),
+                  MaterialPageRoute(builder: (context) => const NursePage()),
                 );
               },
               style: ElevatedButton.styleFrom(
-                primary: rgbaColor(233, 243, 245, 1), // Set button color using RGBA values
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20), // Adjust button padding
+                backgroundColor: rgbaColor(233, 243, 245, 1),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
               ),
-              child: Text('Nurse'),
+              child: const Text('Nurse'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: rgbaColor(233, 243, 245, 1),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+              ),
+              child: const Text('Login'),
             ),
           ],
         ),
@@ -69,7 +89,6 @@ class ClientNursePage extends StatelessWidget {
     );
   }
 
-  // Function to define a Color object using RGBA values
   Color rgbaColor(int r, int g, int b, double opacity) {
     return Color.fromRGBO(r, g, b, opacity);
   }
