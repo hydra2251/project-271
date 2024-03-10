@@ -6,32 +6,34 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(173, 216, 230, 1),
+      backgroundColor: Color.fromARGB(255, 200, 220, 225),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(
+                context); // Navigate back when the back button is pressed
+          },
+        ),
+        backgroundColor: Colors.transparent, // Make the app bar transparent
+        elevation: 0, // Remove the app bar elevation
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 80),
+              const SizedBox(height: 40),
               Image.asset(
                 'lib/assets/nursesicon.png',
-                height: 120,
-              ),
-              const SizedBox(height: 40),
-              const Text(
-                'Welcome Back!',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                height: 200,
               ),
               const SizedBox(height: 20),
               TextFormField(
                 decoration: InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: const Icon(Icons.email),
+                  labelText: 'Username',
+                  prefixIcon: const Icon(Icons.person),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),

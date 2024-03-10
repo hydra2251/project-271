@@ -28,7 +28,8 @@ class ClientNursePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: rgbaColor(233, 243, 245, 1),
+      backgroundColor:
+          Color.fromARGB(255, 200, 220, 225), // Adjust the color here
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -38,58 +39,82 @@ class ClientNursePage extends StatelessWidget {
               width: 200,
               height: 200,
             ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SignInPage()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: rgbaColor(233, 243, 245, 1),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+            const SizedBox(height: 20),
+            Text(
+              'Would you like to sign up as a nurse or\nclient?',
+              style: TextStyle(
+                fontFamily: 'LilyScriptOne',
+                fontSize: 18,
+                color: Colors.black,
               ),
-              child: const Text('Client'),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
+            const SizedBox(height: 40),
+            InkWell(
+              onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const NursePage()),
                 );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: rgbaColor(233, 243, 245, 1),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                color: Colors.transparent,
+                child: const Text(
+                  'Nurse',
+                  style: TextStyle(
+                    fontFamily: 'LilyScriptOne',
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
               ),
-              child: const Text('Nurse'),
             ),
             const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SignInPage()),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                color: Colors.transparent,
+                child: const Text(
+                  'Client',
+                  style: TextStyle(
+                    fontFamily: 'LilyScriptOne',
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            InkWell(
+              onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const LoginPage()),
                 );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: rgbaColor(233, 243, 245, 1),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                color: Colors.transparent,
+                child: const Text(
+                  'Already have an account? Login',
+                  style: TextStyle(
+                    fontFamily: 'LilyScriptOne',
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
               ),
-              child: const Text('Login'),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Color rgbaColor(int r, int g, int b, double opacity) {
-    return Color.fromRGBO(r, g, b, opacity);
   }
 }
