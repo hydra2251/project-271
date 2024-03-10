@@ -1,4 +1,3 @@
-// login.dart
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
@@ -7,6 +6,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(173, 216, 230, 1),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
