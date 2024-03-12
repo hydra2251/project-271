@@ -1,22 +1,19 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:project271/screens/signup_user.dart';
-import 'package:project271/screens/signup_nurse.dart';
 import 'package:project271/screens/login.dart';
+import 'package:project271/screens/signup_nurse.dart';
+import 'package:project271/screens/signup_user.dart';
 
-void main() {
-  HttpOverrides.global = MyHttpOverrides();
-  runApp(const MyApp());
+class SignUpOptionPage extends StatefulWidget {
+  const SignUpOptionPage({super.key});
+
+  @override
+  State<SignUpOptionPage> createState() => _SignUpOptionPageState();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
+class _SignUpOptionPageState extends State<SignUpOptionPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'Client and Nurse Page',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -120,14 +117,5 @@ class ClientNursePage extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
   }
 }
