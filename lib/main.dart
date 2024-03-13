@@ -29,7 +29,7 @@ class ClientNursePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-          Color.fromARGB(255, 200, 220, 225), // Adjust the color here
+          const Color.fromARGB(255, 200, 220, 225), // Adjust the color here
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -40,7 +40,7 @@ class ClientNursePage extends StatelessWidget {
               height: 200,
             ),
             const SizedBox(height: 20),
-            Text(
+            const Text(
               'Would you like to sign up as a nurse or\nclient?',
               style: TextStyle(
                 fontFamily: 'LilyScriptOne',
