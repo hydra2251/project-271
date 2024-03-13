@@ -1,15 +1,37 @@
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  late TextEditingController usernameController;
+  late TextEditingController passwordController;
+
+  @override
+  void initState() {
+    super.initState();
+    usernameController = TextEditingController();
+    passwordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 200, 220, 225),
+      backgroundColor: const Color.fromARGB(255, 200, 220, 225),
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(
                 context); // Navigate back when the back button is pressed
@@ -31,6 +53,7 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               TextFormField(
+                controller: usernameController,
                 decoration: InputDecoration(
                   labelText: 'Username',
                   prefixIcon: const Icon(Icons.person),
@@ -41,6 +64,7 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               TextFormField(
+                controller: passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'Password',
@@ -54,6 +78,9 @@ class LoginPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   // Add your login logic here
+                  String username = usernameController.text;
+                  String password = passwordController.text;
+                  // Perform login authentication
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,

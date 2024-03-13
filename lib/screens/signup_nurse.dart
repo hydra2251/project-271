@@ -5,7 +5,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
 }
 
 class NursePage extends StatelessWidget {
-  const NursePage({super.key});
+  const NursePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,55 +33,57 @@ class NursePage extends StatelessWidget {
         ),
       ),
       backgroundColor: Colors.blue, // Set background color to blue
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Text(
-              'Nurse',
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 20.0),
-            Image.asset(
-              'lib/assets/nursesicon.png',
-              height: 120,
-            ),
-            const SizedBox(height: 20.0),
-            const NurseTextField(label: 'Full Name'),
-            const SizedBox(height: 10.0),
-            const NurseTextField(label: 'Username'),
-            const SizedBox(height: 10.0),
-            const NurseTextField(label: 'Password', isObscured: true),
-            const SizedBox(height: 10.0),
-            const NurseTextField(label: 'Gender'),
-            const SizedBox(height: 10.0),
-            const NurseTextField(label: 'Phone'),
-            const SizedBox(height: 10.0),
-            const NurseTextField(label: 'Email'),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () {
-                // Handle button press
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Colors.blue, // Set button background color to blue
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-              ),
-              child: const Text(
-                'Submit',
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                'Nurse',
                 style: TextStyle(
-                  color: Colors.white, // Set text color to white
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20.0),
+              Image.asset(
+                'lib/assets/nursesicon.png',
+                height: 120,
+              ),
+              const SizedBox(height: 20.0),
+              NurseTextField(label: 'Full Name', controller: TextEditingController()),
+              const SizedBox(height: 10.0),
+              NurseTextField(label: 'Username', controller: TextEditingController()),
+              const SizedBox(height: 10.0),
+              NurseTextField(label: 'Password', isObscured: true, controller: TextEditingController()),
+              const SizedBox(height: 10.0),
+              NurseTextField(label: 'Gender', controller: TextEditingController()),
+              const SizedBox(height: 10.0),
+              NurseTextField(label: 'Phone', controller: TextEditingController()),
+              const SizedBox(height: 10.0),
+              NurseTextField(label: 'Email', controller: TextEditingController()),
+              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: () {
+                  // Handle button press
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                  Colors.blue, // Set button background color to blue
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                ),
+                child: const Text(
+                  'Submit',
+                  style: TextStyle(
+                    color: Colors.white, // Set text color to white
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -91,9 +93,9 @@ class NursePage extends StatelessWidget {
 class NurseTextField extends StatefulWidget {
   final String label;
   final bool isObscured;
+  final TextEditingController controller;
 
-  const NurseTextField({Key? key, required this.label, this.isObscured = false})
-      : super(key: key);
+  const NurseTextField({Key? key, required this.label, this.isObscured = false, required this.controller}) : super(key: key);
 
   @override
   _NurseTextFieldState createState() => _NurseTextFieldState();
@@ -125,6 +127,7 @@ class _NurseTextFieldState extends State<NurseTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: widget.controller,
       style: const TextStyle(color: Colors.white), // Change text color to white
       obscureText: widget.isObscured,
       focusNode: _focusNode,
