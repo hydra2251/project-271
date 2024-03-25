@@ -31,6 +31,8 @@ class ClientNursePage extends StatelessWidget {
     return Scaffold(
       backgroundColor:
       const Color.fromARGB(255, 200, 220, 225), // Adjust the color here
+=======
+
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
