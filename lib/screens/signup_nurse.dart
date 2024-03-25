@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 void main() {
   runApp(const MyApp());
 }
@@ -28,7 +29,7 @@ class NursePage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () {
-            Navigator.pop(context); // Navigate back to the main page
+            Navigator.pop(context); // Navigate back to the previous page
           },
         ),
       ),
@@ -65,22 +66,25 @@ class NursePage extends StatelessWidget {
               const SizedBox(height: 10.0),
               NurseTextField(label: 'Email', controller: TextEditingController()),
               const SizedBox(height: 20.0),
-              ElevatedButton(
-                onPressed: () {
-                  // Handle button press
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                  Colors.blue, // Set button background color to blue
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                ),
-                child: const Text(
-                  'Submit',
-                  style: TextStyle(
-                    color: Colors.white, // Set text color to white
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // Handle button press
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue, // Set button background color to blue
+                      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                    ),
+                    child: const Text(
+                      'Submit',
+                      style: TextStyle(
+                        color: Colors.white, // Set text color to white
+                      ),
+                    ),
                   ),
-                ),
+                               ],
               ),
             ],
           ),
