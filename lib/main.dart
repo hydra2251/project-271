@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project271/screens/signup_user.dart';
 import 'package:project271/screens/signup_nurse.dart';
 import 'package:project271/screens/login.dart';
+import 'package:project271/screens/advancedsignup.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,7 +30,9 @@ class ClientNursePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-          const Color.fromARGB(255, 200, 220, 225), // Adjust the color here
+      const Color.fromARGB(255, 200, 220, 225), // Adjust the color here
+=======
+
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -50,65 +53,91 @@ class ClientNursePage extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
-            InkWell(
-              onTap: () {
+            ElevatedButton(
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const NursePage()),
                 );
               },
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                color: Colors.transparent,
-                child: const Text(
-                  'Nurse',
-                  style: TextStyle(
-                    fontFamily: 'LilyScriptOne',
-                    fontSize: 18,
-                    color: Colors.black,
-                  ),
+              child: const Text(
+                'Nurse',
+                style: TextStyle(
+                  fontFamily: 'LilyScriptOne',
+                  fontSize: 18,
+                  color: Colors.black,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 200, 220, 225),
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 100),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            InkWell(
-              onTap: () {
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const SignInPage()),
                 );
               },
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                color: Colors.transparent,
-                child: const Text(
-                  'Client',
-                  style: TextStyle(
-                    fontFamily: 'LilyScriptOne',
-                    fontSize: 18,
-                    color: Colors.black,
-                  ),
+              child: const Text(
+                'Client',
+                style: TextStyle(
+                  fontFamily: 'LilyScriptOne',
+                  fontSize: 18,
+                  color: Colors.black,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 200, 220, 225),
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 100),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            InkWell(
-              onTap: () {
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) =>  AdvancedSignUpPage()), // Link to AdvancedSignUp page
+                );
+              },
+              child: const Text(
+                'Verify',
+                style: TextStyle(
+                  fontFamily: 'LilyScriptOne',
+                  fontSize: 18,
+                  color: Colors.black,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 200, 220, 225),
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 100),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const LoginPage()),
                 );
               },
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                color: Colors.transparent,
-                child: const Text(
-                  'Already have an account? Login',
-                  style: TextStyle(
-                    fontFamily: 'LilyScriptOne',
-                    fontSize: 18,
-                    color: Colors.black,
-                  ),
+              child: const Text(
+                'Already have an account? Login',
+                style: TextStyle(
+                  fontFamily: 'LilyScriptOne',
+                  fontSize: 18,
+                  color: Colors.black,
                 ),
               ),
             ),
