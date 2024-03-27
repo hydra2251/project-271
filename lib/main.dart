@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:project271/screens/signup_user.dart';
-import 'package:project271/screens/signup_nurse.dart';
 import 'package:project271/screens/login.dart';
+import 'package:project271/screens/signup_nurse.dart';
+import 'package:project271/screens/signup_user.dart';
 import 'package:project271/screens/advancedsignup.dart';
 
 void main() {
@@ -29,10 +29,7 @@ class ClientNursePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-      const Color.fromARGB(255, 200, 220, 225), // Adjust the color here
-=======
-
+      backgroundColor: const Color.fromARGB(255, 200, 220, 225),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -70,7 +67,8 @@ class ClientNursePage extends StatelessWidget {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 200, 220, 225),
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 100),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 100),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -81,7 +79,7 @@ class ClientNursePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SignInPage()),
+                  MaterialPageRoute(builder: (context) => const SignUpUser()),
                 );
               },
               child: const Text(
@@ -94,7 +92,8 @@ class ClientNursePage extends StatelessWidget {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 200, 220, 225),
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 100),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 100),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -105,7 +104,8 @@ class ClientNursePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>  AdvancedSignUpPage()), // Link to AdvancedSignUp page
+                  MaterialPageRoute(
+                      builder: (context) => const AdvancedSignUpPage()),
                 );
               },
               child: const Text(
@@ -118,7 +118,8 @@ class ClientNursePage extends StatelessWidget {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 200, 220, 225),
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 100),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 100),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
