@@ -1,21 +1,5 @@
 import 'package:flutter/material.dart';
 
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: NursePage(),
-    );
-  }
-}
-
 class NursePage extends StatelessWidget {
   const NursePage({Key? key}) : super(key: key);
 
@@ -24,16 +8,16 @@ class NursePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.blue, // Set app bar color to blue
+        backgroundColor: Colors.blue,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () {
-            Navigator.pop(context); // Navigate back to the previous page
+            Navigator.pop(context);
           },
         ),
       ),
-      backgroundColor: Colors.blue, // Set background color to blue
+      backgroundColor: Colors.blue,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -54,17 +38,65 @@ class NursePage extends StatelessWidget {
                 height: 120,
               ),
               const SizedBox(height: 20.0),
-              NurseTextField(label: 'Full Name', controller: TextEditingController()),
+              NurseTextField(
+                label: 'Full Name',
+                controller: TextEditingController(),
+              ),
               const SizedBox(height: 10.0),
-              NurseTextField(label: 'Username', controller: TextEditingController()),
+              NurseTextField(
+                label: 'Username',
+                controller: TextEditingController(),
+              ),
               const SizedBox(height: 10.0),
-              NurseTextField(label: 'Password', isObscured: true, controller: TextEditingController()),
+              NurseTextField(
+                label: 'Password',
+                isObscured: true,
+                controller: TextEditingController(),
+                isPassword: true,
+              ),
               const SizedBox(height: 10.0),
-              NurseTextField(label: 'Gender', controller: TextEditingController()),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white),
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: DropdownButtonFormField<String>(
+                    dropdownColor: Colors.blue,
+                    decoration: InputDecoration(
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.transparent),
+                      ),
+                    ),
+                    style: TextStyle(color: Colors.white),
+                    items: ['Male', 'Female']
+                        .map((gender) => DropdownMenuItem(
+                              value: gender,
+                              child: Text(gender),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      // Handle gender selection
+                    },
+                    hint: Text(
+                      'Gender',
+                      style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 10.0),
-              NurseTextField(label: 'Phone', controller: TextEditingController()),
+              NurseTextField(
+                label: 'Phone',
+                controller: TextEditingController(),
+              ),
               const SizedBox(height: 10.0),
-              NurseTextField(label: 'Email', controller: TextEditingController()),
+              NurseTextField(
+                label: 'Email',
+                controller: TextEditingController(),
+                isEmail: true,
+              ),
               const SizedBox(height: 20.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -74,17 +106,18 @@ class NursePage extends StatelessWidget {
                       // Handle button press
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, // Set button background color to blue
-                      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                      backgroundColor: Colors.blue,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 50, vertical: 20),
                     ),
                     child: const Text(
                       'Submit',
                       style: TextStyle(
-                        color: Colors.white, // Set text color to white
+                        color: Colors.white,
                       ),
                     ),
                   ),
-                               ],
+                ],
               ),
             ],
           ),
@@ -98,8 +131,17 @@ class NurseTextField extends StatefulWidget {
   final String label;
   final bool isObscured;
   final TextEditingController controller;
+  final bool isPassword;
+  final bool isEmail;
 
-  const NurseTextField({Key? key, required this.label, this.isObscured = false, required this.controller}) : super(key: key);
+  const NurseTextField({
+    Key? key,
+    required this.label,
+    this.isObscured = false,
+    required this.controller,
+    this.isPassword = false,
+    this.isEmail = false,
+  }) : super(key: key);
 
   @override
   _NurseTextFieldState createState() => _NurseTextFieldState();
@@ -132,16 +174,40 @@ class _NurseTextFieldState extends State<NurseTextField> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
-      style: const TextStyle(color: Colors.white), // Change text color to white
+      style: const TextStyle(color: Colors.white),
       obscureText: widget.isObscured,
       focusNode: _focusNode,
       decoration: InputDecoration(
         hintText: _isFocused ? '' : widget.label,
-        hintStyle: TextStyle(
-            color: Colors.white.withOpacity(
-                0.7)), // Set placeholder color to white with opacity
+        hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
         border: InputBorder.none,
+        errorText: widget.isPassword
+            ? _validatePassword(widget.controller.text)
+            : widget.isEmail
+                ? _validateEmail(widget.controller.text)
+                : null,
       ),
     );
   }
+
+  String? _validatePassword(String value) {
+    if (value.isEmpty) {
+      return 'Password is required';
+    } else if (value.length < 6) {
+      return 'Password must be at least 6 characters long';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String value) {
+    final emailPattern =
+        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'; // Regular expression for email validation
+    if (value.isEmpty) {
+      return 'Email is required';
+    } else if (!RegExp(emailPattern).hasMatch(value)) {
+      return 'Enter a valid email';
+    }
+    return null;
+  }
 }
+
