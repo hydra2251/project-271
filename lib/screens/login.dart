@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'profile_screen_nurse.dart';
+import 'profile_screen_user.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -33,12 +35,11 @@ class _LoginPageState extends State<LoginPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(
-                context); // Navigate back when the back button is pressed
+            Navigator.pop(context);
           },
         ),
-        backgroundColor: Colors.transparent, // Make the app bar transparent
-        elevation: 0, // Remove the app bar elevation
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -76,11 +77,38 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  // Add your login logic here
+                onPressed: () async {
                   String username = usernameController.text;
                   String password = passwordController.text;
-                  // Perform login authentication
+
+                  // Call your authentication API here, passing username and password
+                  // Example:
+                  bool loginSuccess =
+                      await authenticateUser(username, password);
+
+                  if (loginSuccess) {
+                    // Assuming you receive user type information from the server
+                    String userType = await getUserType(
+                        username); // Fetch user type from backend
+
+                    if (userType == 'nurse') {
+                      // Navigate to nurse profile screen
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfileScreenNurse()),
+                      );
+                    } else {
+                      // Navigate to regular user profile screen
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfileScreenUser()),
+                      );
+                    }
+                  } else {
+                    // Show error message or handle failed login
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
@@ -107,4 +135,23 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
+  // Function to authenticate user with username and password
+  Future<bool> authenticateUser(String username, String password) async {
+    // Replace this with your authentication logic, e.g., calling an API
+    // Example:
+    // bool loginSuccess = await yourAuthService.login(username, password);
+    bool loginSuccess = true; // Placeholder, replace with actual logic
+    return loginSuccess;
+  }
+
+  // Function to get the user type (nurse or user) from the backend
+  Future<String> getUserType(String username) async {
+    // Replace this with your logic to fetch user type from backend
+    // Example:
+    // String userType = await yourBackendService.getUserType(username);
+    String userType = 'user'; // Placeholder, replace with actual logic
+    return userType;
+  }
 }
+
