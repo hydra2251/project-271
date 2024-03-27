@@ -1,60 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:project271/screens/login.dart'; // Import LoginPage if not already imported
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class SignUpUser extends StatefulWidget {
+  const SignUpUser({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: SignInPage(),
-    );
+  _SignUpUserState createState() => _SignUpUserState();
+}
+
+class _SignUpUserState extends State<SignUpUser> {
+  late FocusNode nameFocusNode;
+  late FocusNode ageFocusNode;
+  late FocusNode phoneFocusNode;
+  late FocusNode emailFocusNode;
+  late FocusNode passwordFocusNode;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  List<String> genderOptions = ['Male', 'Female'];
+  String? selectedGender; // Change to nullable type
+
+  final String emailPattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+
+  @override
+  void initState() {
+    super.initState();
+    nameFocusNode = FocusNode();
+    ageFocusNode = FocusNode();
+    phoneFocusNode = FocusNode();
+    emailFocusNode = FocusNode();
+    passwordFocusNode = FocusNode();
   }
-}
-
-class SignInPage extends StatefulWidget {
-  const SignInPage({Key? key}) : super(key: key);
-
-  @override
-  _SignInPageState createState() => _SignInPageState();
-}
-
-class _SignInPageState extends State<SignInPage> {
-  // Create focus nodes for each text field
-  FocusNode nameFocusNode = FocusNode();
-  FocusNode ageFocusNode = FocusNode();
-  FocusNode genderFocusNode = FocusNode();
-  FocusNode phoneFocusNode = FocusNode();
-  FocusNode emailFocusNode = FocusNode();
 
   @override
   void dispose() {
-    // Dispose of the focus nodes when the widget is disposed
     nameFocusNode.dispose();
     ageFocusNode.dispose();
-    genderFocusNode.dispose();
     phoneFocusNode.dispose();
     emailFocusNode.dispose();
+    passwordFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: rgbaColor(233, 243, 245, 1),
+      backgroundColor: const Color.fromARGB(255, 200, 220, 225),
       appBar: AppBar(
-        backgroundColor: rgbaColor(
-            233, 243, 245, 1), // Change the color of the navigation bar
-        automaticallyImplyLeading: false, // Hide the default back button
+        backgroundColor: const Color.fromARGB(255, 200, 220, 225),
+        automaticallyImplyLeading: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           color: Colors.blue,
           onPressed: () {
-            Navigator.pop(
-                context); // Navigate back when the back button is pressed
+            Navigator.pop(context);
           },
         ),
       ),
@@ -65,118 +64,132 @@ class _SignInPageState extends State<SignInPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Text(
-                'Client', // Add text "Client" above the picture
+                'Client',
                 style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue),
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
               ),
               const SizedBox(height: 10.0),
               Image.asset(
                 'lib/assets/nursesicon.png',
                 height: 120,
               ),
-              const SizedBox(height: 40.0), // Increase spacing below the image
+              const SizedBox(height: 40.0),
               TextFormField(
-                style: const TextStyle(
-                    color: Colors.blue), // Change text color
+                style: const TextStyle(color: Colors.blue),
                 focusNode: nameFocusNode,
                 onTap: () {
-                  // Set focus on the text field and clear placeholder when tapped
                   setState(() {
                     FocusScope.of(context).requestFocus(nameFocusNode);
                   });
                 },
                 decoration: InputDecoration(
                   labelText: nameFocusNode.hasFocus ? '' : 'Name',
-                  labelStyle: const TextStyle(
-                      color: Colors.blue), // Change label color
-                  border: InputBorder.none, // Remove border
+                  labelStyle: const TextStyle(color: Colors.blue),
+                  border: InputBorder.none,
                 ),
               ),
               const SizedBox(height: 10.0),
               TextFormField(
-                style: const TextStyle(
-                    color: Colors.blue), // Change text color
+                style: const TextStyle(color: Colors.blue),
                 focusNode: ageFocusNode,
                 onTap: () {
-                  // Set focus on the text field and clear placeholder when tapped
                   setState(() {
                     FocusScope.of(context).requestFocus(ageFocusNode);
                   });
                 },
                 decoration: InputDecoration(
                   labelText: ageFocusNode.hasFocus ? '' : 'Age',
-                  labelStyle: const TextStyle(
-                      color: Colors.blue), // Change label color
-                  border: InputBorder.none, // Remove border
+                  labelStyle: const TextStyle(color: Colors.blue),
+                  border: InputBorder.none,
                 ),
               ),
               const SizedBox(height: 10.0),
-              TextFormField(
-                style: const TextStyle(
-                    color: Colors.blue), // Change text color
-                focusNode: genderFocusNode,
-                onTap: () {
-                  // Set focus on the text field and clear placeholder when tapped
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Gender',
+                  labelStyle: const TextStyle(color: Colors.blue),
+                  border: InputBorder.none,
+                ),
+                value: selectedGender,
+                onChanged: (newValue) {
                   setState(() {
-                    FocusScope.of(context).requestFocus(genderFocusNode);
+                    selectedGender = newValue!;
                   });
                 },
-                decoration: InputDecoration(
-                  labelText: genderFocusNode.hasFocus ? '' : 'Gender',
-                  labelStyle: const TextStyle(
-                      color: Colors.blue), // Change label color
-                  border: InputBorder.none, // Remove border
-                ),
+                items: genderOptions.map((gender) {
+                  return DropdownMenuItem<String>(
+                    value: gender,
+                    child: Text(
+                      gender,
+                      style: const TextStyle(color: Colors.blue),
+                    ),
+                  );
+                }).toList(),
               ),
               const SizedBox(height: 10.0),
               TextFormField(
-                style: const TextStyle(
-                    color: Colors.blue), // Change text color
-                focusNode: phoneFocusNode,
-                onTap: () {
-                  // Set focus on the text field and clear placeholder when tapped
-                  setState(() {
-                    FocusScope.of(context).requestFocus(phoneFocusNode);
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: phoneFocusNode.hasFocus ? '' : 'Phone',
-                  labelStyle: const TextStyle(
-                      color: Colors.blue), // Change label color
-                  border: InputBorder.none, // Remove border
-                ),
-              ),
-              const SizedBox(height: 10.0),
-              TextFormField(
-                style: const TextStyle(
-                    color: Colors.blue), // Change text color
+                controller: _emailController,
+                style: const TextStyle(color: Colors.blue),
                 focusNode: emailFocusNode,
                 onTap: () {
-                  // Set focus on the text field and clear placeholder when tapped
                   setState(() {
                     FocusScope.of(context).requestFocus(emailFocusNode);
                   });
                 },
                 decoration: InputDecoration(
                   labelText: emailFocusNode.hasFocus ? '' : 'Email',
-                  labelStyle: const TextStyle(
-                      color: Colors.blue), // Change label color
-                  border: InputBorder.none, // Remove border
+                  labelStyle: const TextStyle(color: Colors.blue),
+                  border: InputBorder.none,
+                  errorText: _validateEmail(_emailController.text),
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              TextFormField(
+                controller: _passwordController,
+                style: const TextStyle(color: Colors.blue),
+                focusNode: passwordFocusNode,
+                onTap: () {
+                  setState(() {
+                    FocusScope.of(context).requestFocus(passwordFocusNode);
+                  });
+                },
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: passwordFocusNode.hasFocus ? '' : 'Password',
+                  labelStyle: const TextStyle(color: Colors.blue),
+                  border: InputBorder.none,
+                  errorText: _validatePassword(_passwordController.text),
                 ),
               ),
               const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
-                  // Add your sign-in logic here
+                  // Add your sign-up logic here
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                      const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                 ),
                 child: const Text('Sign Up'),
+              ),
+              const SizedBox(height: 20.0),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  );
+                },
+                child: const Text(
+                  'Already have an account? Login',
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
               ),
             ],
           ),
@@ -185,7 +198,23 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  Color rgbaColor(int r, int g, int b, double opacity) {
-    return Color.fromRGBO(r, g, b, opacity);
+  String? _validatePassword(String value) {
+    if (value.isEmpty) {
+      return 'Password is required';
+    } else if (value.length < 6) {
+      return 'Password must be at least 6 characters long';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String value) {
+    final emailPattern =
+        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'; // Regular expression for email validation
+    if (value.isEmpty) {
+      return 'Email is required';
+    } else if (!RegExp(emailPattern).hasMatch(value)) {
+      return 'Enter a valid email';
+    }
+    return null;
   }
 }
