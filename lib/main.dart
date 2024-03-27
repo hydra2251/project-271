@@ -104,8 +104,7 @@ class ClientNursePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const AdvancedSignUpPage()),
+                  MaterialPageRoute(builder: (context) => AdvancedSignUpPage()),
                 );
               },
               child: const Text(
