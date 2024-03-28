@@ -3,24 +3,12 @@ import 'package:project271/screens/login.dart';
 import 'package:project271/screens/signup_nurse.dart';
 import 'package:project271/screens/signup_user.dart';
 
-class SignUpOptionPage extends StatefulWidget {
-  const SignUpOptionPage({super.key});
+class ChooseSignUpOption extends StatelessWidget {
+  const ChooseSignUpOption({super.key});
 
-  @override
-  State<SignUpOptionPage> createState() => _SignUpOptionPageState();
-}
-
-class _SignUpOptionPageState extends State<SignUpOptionPage> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Client and Nurse Page',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const ClientNursePage(),
-    );
+    return const ClientNursePage();
   }
 }
 

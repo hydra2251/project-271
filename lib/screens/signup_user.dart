@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -9,6 +11,7 @@ import 'package:project271/Designs/loadingscreen.dart';
 import 'package:project271/Designs/popupalert.dart';
 import 'package:project271/globalvariables.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -16,6 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: SignInPage(),
     );
   }
@@ -329,7 +333,11 @@ class _SignInPageState extends State<SignInPage> {
       showLoadingDialog(context, false);
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
-        print(responseData);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('UserId', responseData['userId'].toString());
+        prefs.setString('Username', usernamecontroller.text);
+        prefs.setString('Token', responseData['token'].toString());
+        prefs.setString('RoleId', '1');
         showalert(context, "User Registered", AlertType.success);
       } else {
         String error = response.body;

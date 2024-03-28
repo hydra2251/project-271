@@ -7,6 +7,7 @@ import 'package:project271/Designs/loadingscreen.dart';
 import 'package:project271/Designs/popupalert.dart';
 import 'package:project271/globalvariables.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -148,20 +149,28 @@ Future<void> loginuserdatabase(
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(userData),
     ).timeout(const Duration(seconds: 10));
-    showLoadingDialog(context, false);
+
     if (response.statusCode == 200) {
-      showalert(context, "User Registered", AlertType.success);
+      Navigator.of(context, rootNavigator: true).pop();
+      var responseData = jsonDecode(response.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('UserId', responseData['userId'].toString());
+      prefs.setString('Username', usernamecontroller.text);
+      prefs.setString('Token', responseData['token'].toString());
+      prefs.setString('RoleId', responseData["roleId"].toString());
+      showalert(context, "User Logged In", AlertType.success);
       print(response.body);
     } else {
+      Navigator.of(context, rootNavigator: true).pop();
       String error = response.body;
       showalert(context, error, AlertType.warning);
     }
   } on TimeoutException catch (_) {
-    showLoadingDialog(context, false);
+    Navigator.of(context, rootNavigator: true).pop();
     showalert(
         context, "The request timed out. Please try again.", AlertType.error);
   } catch (e) {
-    showLoadingDialog(context, false);
+    Navigator.of(context, rootNavigator: true).pop();
     print(e);
     showalert(context, "Application Encountered an Unhandled Exception",
         AlertType.error);
