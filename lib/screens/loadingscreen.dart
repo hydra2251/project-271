@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:project271/globalvariables.dart';
@@ -30,8 +31,10 @@ class _LoadingState extends State<Loading> {
 
     if (username != null) {
       try {
-        Uri url = Uri.parse("${GlobalVariables.apilink}/User/test");
-        Response response = await get(
+        Uri url = Uri.parse(
+            "${GlobalVariables.apilink}/User/test?username=$username");
+
+        Response response = await post(
           url,
           headers: {
             "Content-Type": "application/json",

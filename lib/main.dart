@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:project271/screens/adminpage.dart';
+import 'package:project271/screens/choosesignupoption.dart';
 import 'package:project271/screens/loadingscreen.dart';
 
 void main() {
@@ -7,7 +9,7 @@ void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     routes: {
-      '/': (context) => const Loading(),
+      '/': (context) => const AdminPage(),
     },
   ));
 }
