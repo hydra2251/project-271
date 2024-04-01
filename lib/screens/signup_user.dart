@@ -1,41 +1,70 @@
-import 'package:flutter/material.dart';
-import 'package:project271/screens/login.dart'; // Import LoginPage if not already imported
+// ignore_for_file: use_build_context_synchronously
 
-class SignUpUser extends StatefulWidget {
-  const SignUpUser({Key? key}) : super(key: key);
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:email_validator/email_validator.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart';
+import 'package:project271/Designs/loadingscreen.dart';
+import 'package:project271/Designs/popupalert.dart';
+import 'package:project271/globalvariables.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
-  _SignUpUserState createState() => _SignUpUserState();
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: SignInPage(),
+    );
+  }
 }
 
-class _SignUpUserState extends State<SignUpUser> {
-  late FocusNode nameFocusNode;
-  late FocusNode ageFocusNode;
-  late FocusNode phoneFocusNode;
-  late FocusNode emailFocusNode;
-  late FocusNode passwordFocusNode;
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  List<String> genderOptions = ['Male', 'Female'];
-  String? selectedGender; // Change to nullable type
-
-  final String emailPattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+class SignInPage extends StatefulWidget {
+  const SignInPage({super.key});
 
   @override
+  _SignInPageState createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  // Create focus nodes for each text field
+  FocusNode firstnameFocusNode = FocusNode();
+  FocusNode lastnameaFocusNode = FocusNode();
+  FocusNode usernameFocusNode = FocusNode();
+  FocusNode phoneFocusNode = FocusNode();
+  FocusNode emailFocusNode = FocusNode();
+  FocusNode passwordFocusNode = FocusNode();
+  late TextEditingController firstnamecontroller;
+  late TextEditingController lastnamecontroller;
+  late TextEditingController usernamecontroller;
+  late TextEditingController emailcontroller;
+  late TextEditingController phonenumbercontroller;
+  late TextEditingController passwordcontroller;
+  bool _obscureText = true;
+  @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    nameFocusNode = FocusNode();
-    ageFocusNode = FocusNode();
-    phoneFocusNode = FocusNode();
-    emailFocusNode = FocusNode();
-    passwordFocusNode = FocusNode();
+    firstnamecontroller = TextEditingController();
+    lastnamecontroller = TextEditingController();
+    usernamecontroller = TextEditingController();
+    emailcontroller = TextEditingController();
+    phonenumbercontroller = TextEditingController();
+    passwordcontroller = TextEditingController();
   }
 
   @override
   void dispose() {
-    nameFocusNode.dispose();
-    ageFocusNode.dispose();
+    // Dispose of the focus nodes when the widget is disposed
+    firstnameFocusNode.dispose();
+    lastnameaFocusNode.dispose();
+    usernameFocusNode.dispose();
     phoneFocusNode.dispose();
     emailFocusNode.dispose();
     passwordFocusNode.dispose();
@@ -45,10 +74,12 @@ class _SignUpUserState extends State<SignUpUser> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 200, 220, 225),
+      resizeToAvoidBottomInset: true,
+      backgroundColor: rgbaColor(233, 243, 245, 1),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 200, 220, 225),
-        automaticallyImplyLeading: false,
+        backgroundColor: rgbaColor(
+            233, 243, 245, 1), // Change the color of the navigation bar
+        automaticallyImplyLeading: true, // Hide the default back button
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           color: Colors.blue,
@@ -57,164 +88,268 @@ class _SignUpUserState extends State<SignUpUser> {
           },
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                'Client',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-              const SizedBox(height: 10.0),
-              Image.asset(
-                'lib/assets/nursesicon.png',
-                height: 120,
-              ),
-              const SizedBox(height: 40.0),
-              TextFormField(
-                style: const TextStyle(color: Colors.blue),
-                focusNode: nameFocusNode,
-                onTap: () {
-                  setState(() {
-                    FocusScope.of(context).requestFocus(nameFocusNode);
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: nameFocusNode.hasFocus ? '' : 'Name',
-                  labelStyle: const TextStyle(color: Colors.blue),
-                  border: InputBorder.none,
-                ),
-              ),
-              const SizedBox(height: 10.0),
-              TextFormField(
-                style: const TextStyle(color: Colors.blue),
-                focusNode: ageFocusNode,
-                onTap: () {
-                  setState(() {
-                    FocusScope.of(context).requestFocus(ageFocusNode);
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: ageFocusNode.hasFocus ? '' : 'Age',
-                  labelStyle: const TextStyle(color: Colors.blue),
-                  border: InputBorder.none,
-                ),
-              ),
-              const SizedBox(height: 10.0),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'Gender',
-                  labelStyle: const TextStyle(color: Colors.blue),
-                  border: InputBorder.none,
-                ),
-                value: selectedGender,
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedGender = newValue!;
-                  });
-                },
-                items: genderOptions.map((gender) {
-                  return DropdownMenuItem<String>(
-                    value: gender,
-                    child: Text(
-                      gender,
-                      style: const TextStyle(color: Colors.blue),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 10.0),
-              TextFormField(
-                controller: _emailController,
-                style: const TextStyle(color: Colors.blue),
-                focusNode: emailFocusNode,
-                onTap: () {
-                  setState(() {
-                    FocusScope.of(context).requestFocus(emailFocusNode);
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: emailFocusNode.hasFocus ? '' : 'Email',
-                  labelStyle: const TextStyle(color: Colors.blue),
-                  border: InputBorder.none,
-                  errorText: _validateEmail(_emailController.text),
-                ),
-              ),
-              const SizedBox(height: 10.0),
-              TextFormField(
-                controller: _passwordController,
-                style: const TextStyle(color: Colors.blue),
-                focusNode: passwordFocusNode,
-                onTap: () {
-                  setState(() {
-                    FocusScope.of(context).requestFocus(passwordFocusNode);
-                  });
-                },
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: passwordFocusNode.hasFocus ? '' : 'Password',
-                  labelStyle: const TextStyle(color: Colors.blue),
-                  border: InputBorder.none,
-                  errorText: _validatePassword(_passwordController.text),
-                ),
-              ),
-              const SizedBox(height: 20.0),
-              ElevatedButton(
-                onPressed: () {
-                  // Add your sign-up logic here
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                ),
-                child: const Text('Sign Up'),
-              ),
-              const SizedBox(height: 20.0),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                  );
-                },
-                child: const Text(
-                  'Already have an account? Login',
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  'Client', // Add text "Client" above the picture
                   style: TextStyle(
-                    color: Colors.black,
-                  ),
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue),
                 ),
-              ),
-            ],
+                const SizedBox(height: 10.0),
+                Image.asset(
+                  'lib/assets/nursesicon.png',
+                  height: 120,
+                ),
+                const SizedBox(
+                    height: 40.0), // Increase spacing below the image
+                Column(
+                  children: [
+                    TextFormField(
+                      controller: firstnamecontroller,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'[a-zA-Z]')), // Allow only letters
+                      ],
+                      style: const TextStyle(
+                          color: Colors.blue), // Change text color
+                      focusNode: firstnameFocusNode,
+                      onTap: () {
+                        // Set focus on the text field and clear placeholder when tapped
+                        setState(() {
+                          FocusScope.of(context)
+                              .requestFocus(firstnameFocusNode);
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText:
+                            firstnameFocusNode.hasFocus ? '' : ' First Name',
+                        labelStyle: const TextStyle(
+                            color: Colors.blue), // Change label color
+                        border: InputBorder.none, // Remove border
+                      ),
+                    ),
+                    const SizedBox(height: 10.0),
+                    TextFormField(
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'[a-zA-Z]')), // Allow only letters
+                      ],
+                      controller: lastnamecontroller,
+                      style: const TextStyle(
+                          color: Colors.blue), // Change text color
+                      focusNode: lastnameaFocusNode,
+                      onTap: () {
+                        // Set focus on the text field and clear placeholder when tapped
+                        setState(() {
+                          FocusScope.of(context)
+                              .requestFocus(lastnameaFocusNode);
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText:
+                            lastnameaFocusNode.hasFocus ? '' : 'Last Name',
+                        labelStyle: const TextStyle(
+                            color: Colors.blue), // Change label color
+                        border: InputBorder.none, // Remove border
+                      ),
+                    ),
+                    const SizedBox(height: 10.0),
+                    TextFormField(
+                      controller: usernamecontroller,
+                      style: const TextStyle(
+                          color: Colors.blue), // Change text color
+                      focusNode: usernameFocusNode,
+                      onTap: () {
+                        // Set focus on the text field and clear placeholder when tapped
+                        setState(() {
+                          FocusScope.of(context)
+                              .requestFocus(usernameFocusNode);
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: usernameFocusNode.hasFocus ? '' : 'Username',
+                        labelStyle: const TextStyle(
+                            color: Colors.blue), // Change label color
+                        border: InputBorder.none, // Remove border
+                      ),
+                    ),
+                    const SizedBox(height: 10.0),
+                    TextFormField(
+                      controller: phonenumbercontroller,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(8),
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'[0-9]')), // Allow only numbers
+                      ],
+                      keyboardType: TextInputType.phone,
+                      style: const TextStyle(
+                          color: Colors.blue), // Change text color
+                      focusNode: phoneFocusNode,
+                      onTap: () {
+                        // Set focus on the text field and clear placeholder when tapped
+                        setState(() {
+                          FocusScope.of(context).requestFocus(phoneFocusNode);
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: phoneFocusNode.hasFocus ? '' : 'Phone',
+                        labelStyle: const TextStyle(
+                            color: Colors.blue), // Change label color
+                        border: InputBorder.none, // Remove border
+                      ),
+                    ),
+                    const SizedBox(height: 10.0),
+                    TextFormField(
+                      controller: emailcontroller,
+                      style: const TextStyle(
+                          color: Colors.blue), // Change text color
+                      focusNode: emailFocusNode,
+                      onTap: () {
+                        // Set focus on the text field and clear placeholder when tapped
+                        setState(() {
+                          FocusScope.of(context).requestFocus(emailFocusNode);
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: emailFocusNode.hasFocus ? '' : 'Email',
+                        labelStyle: const TextStyle(
+                            color: Colors.blue), // Change label color
+                        border: InputBorder.none, // Remove border
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    TextFormField(
+                      controller: passwordcontroller,
+                      style: const TextStyle(
+                          color: Colors.blue), // Change text color
+                      focusNode: passwordFocusNode,
+                      onTap: () {
+                        // Set focus on the text field and clear placeholder when tapped
+                        setState(() {
+                          FocusScope.of(context)
+                              .requestFocus(passwordFocusNode);
+                        });
+                      },
+                      obscureText:
+                          _obscureText, // Hide or reveal password based on this value
+                      decoration: InputDecoration(
+                        labelText: usernameFocusNode.hasFocus ? '' : 'Password',
+                        labelStyle: const TextStyle(
+                            color: Colors.blue), // Change label color
+                        border: InputBorder.none, // Remove border
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.blue,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureText =
+                                  !_obscureText; // Toggle obscure text
+                            });
+                          },
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 20.0),
+                ElevatedButton(
+                  onPressed: () {
+                    signupuser();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 20),
+                  ),
+                  child: const Text('Sign Up'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  String? _validatePassword(String value) {
-    if (value.isEmpty) {
-      return 'Password is required';
-    } else if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
-    }
-    return null;
+  Color rgbaColor(int r, int g, int b, double opacity) {
+    return Color.fromRGBO(r, g, b, opacity);
   }
 
-  String? _validateEmail(String value) {
-    final emailPattern =
-        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'; // Regular expression for email validation
-    if (value.isEmpty) {
-      return 'Email is required';
-    } else if (!RegExp(emailPattern).hasMatch(value)) {
-      return 'Enter a valid email';
+  void signupuser() {
+    if (firstnamecontroller.text.isEmpty ||
+        lastnamecontroller.text.isEmpty ||
+        usernamecontroller.text.isEmpty ||
+        emailcontroller.text.isEmpty ||
+        phonenumbercontroller.text.isEmpty ||
+        passwordcontroller.text.isEmpty) {
+      showalert(context, "Fill all the Fields", AlertType.warning);
+      return;
     }
-    return null;
+    if (phonenumbercontroller.text.length != 8) {
+      showalert(context, "Phone Number must be 8 digits", AlertType.warning);
+      phonenumbercontroller.text = "";
+      return;
+    }
+    if (!EmailValidator.validate(emailcontroller.text)) {
+      showalert(context, "Enter a Valid Email", AlertType.warning);
+      emailcontroller.text = "";
+      return;
+    }
+    showLoadingDialog(context, true);
+    registeruser();
+  }
+
+  Future<void> registeruser() async {
+    try {
+      Uri url = Uri.parse("${GlobalVariables.apilink}/User/register");
+      Map<String, dynamic> userData = {
+        "Username": usernamecontroller.text,
+        "FirstName": firstnamecontroller.text,
+        "LastName": lastnamecontroller.text,
+        "PhoneNumber": phonenumbercontroller.text,
+        "Password": passwordcontroller.text,
+        "Email": emailcontroller.text,
+        "RoleId": 1
+      };
+      Response response = await post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(userData),
+      ).timeout(const Duration(seconds: 10));
+      showLoadingDialog(context, false);
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('UserId', responseData['userId'].toString());
+        prefs.setString('Username', usernamecontroller.text);
+        prefs.setString('Token', responseData['token'].toString());
+        prefs.setString('RoleId', '1');
+        showalert(context, "User Registered", AlertType.success);
+      } else {
+        String error = response.body;
+        showalert(context, error, AlertType.warning);
+      }
+    } on TimeoutException catch (_) {
+      showLoadingDialog(context, false);
+      showalert(
+          context, "The request timed out. Please try again.", AlertType.error);
+    } catch (e) {
+      print(e);
+      showalert(context, "Application Encountered an Unhandled Exception",
+          AlertType.error);
+    }
   }
 }

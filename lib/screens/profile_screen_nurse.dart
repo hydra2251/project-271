@@ -1,6 +1,5 @@
 // profile_screen_nurse.dart
 import 'package:flutter/material.dart';
-import 'package:project271/screens/profile_screen_user.dart';
 
 class ProfileScreenNurse extends StatelessWidget {
   const ProfileScreenNurse({Key? key}) : super(key: key);

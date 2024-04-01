@@ -1,31 +1,19 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'profile_screen_nurse.dart';
-import 'profile_screen_user.dart';
+import 'package:http/http.dart';
+import 'package:project271/Designs/loadingscreen.dart';
+import 'package:project271/Designs/popupalert.dart';
+import 'package:project271/globalvariables.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
-
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  late TextEditingController usernameController;
-  late TextEditingController passwordController;
-
-  @override
-  void initState() {
-    super.initState();
-    usernameController = TextEditingController();
-    passwordController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    usernameController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
+class LoginPage extends StatelessWidget {
+  LoginPage({Key? key}) : super(key: key);
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController =
+      TextEditingController(); // Added password controller
 
   @override
   Widget build(BuildContext context) {
@@ -64,52 +52,13 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              TextFormField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  prefixIcon: const Icon(Icons.lock),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
+              PasswordField(
+                controller: passwordController, // Pass the password controller
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () async {
-                  String username = usernameController.text;
-                  String password = passwordController.text;
-
-                  // Call your authentication API here, passing username and password
-                  // Example:
-                  bool loginSuccess =
-                      await authenticateUser(username, password);
-
-                  if (loginSuccess) {
-                    // Assuming you receive user type information from the server
-                    String userType = await getUserType(
-                        username); // Fetch user type from backend
-
-                    if (userType == 'nurse') {
-                      // Navigate to nurse profile screen
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProfileScreenNurse()),
-                      );
-                    } else {
-                      // Navigate to regular user profile screen
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProfileScreenUser()),
-                      );
-                    }
-                  } else {
-                    // Show error message or handle failed login
-                  }
-                },
+                onPressed: () =>
+                    loginuser(context, usernameController, passwordController),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   shape: RoundedRectangleBorder(
@@ -123,35 +72,106 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              TextButton(
-                onPressed: () {
-                  // Add your navigation logic for the forgot password page
-                },
-                child: const Text('Forgot Password?'),
-              ),
+              // TextButton(
+              //   onPressed: () {
+              //     // Add your navigation logic for the forgot password page
+              //   },
+              //   child: const Text('Forgot Password?'),
+              // ),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  // Function to authenticate user with username and password
-  Future<bool> authenticateUser(String username, String password) async {
-    // Replace this with your authentication logic, e.g., calling an API
-    // Example:
-    // bool loginSuccess = await yourAuthService.login(username, password);
-    bool loginSuccess = true; // Placeholder, replace with actual logic
-    return loginSuccess;
-  }
+class PasswordField extends StatefulWidget {
+  final TextEditingController controller; // Added controller property
+  const PasswordField(
+      {required this.controller}); // Modified constructor to accept controller
 
-  // Function to get the user type (nurse or user) from the backend
-  Future<String> getUserType(String username) async {
-    // Replace this with your logic to fetch user type from backend
-    // Example:
-    // String userType = await yourBackendService.getUserType(username);
-    String userType = 'user'; // Placeholder, replace with actual logic
-    return userType;
+  @override
+  _PasswordFieldState createState() => _PasswordFieldState();
+}
+
+class _PasswordFieldState extends State<PasswordField> {
+  bool _showPassword = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: widget.controller, // Bind the controller to the TextFormField
+      obscureText: !_showPassword,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        prefixIcon: const Icon(Icons.lock),
+        suffixIcon: IconButton(
+          icon: Icon(_showPassword ? Icons.visibility : Icons.visibility_off),
+          onPressed: () {
+            setState(() {
+              _showPassword = !_showPassword;
+            });
+          },
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+    );
   }
 }
 
+loginuser(BuildContext context, TextEditingController usernamecontroller,
+    TextEditingController passwordcontroller) async {
+  if (usernamecontroller.text.isEmpty || passwordcontroller.text.isEmpty) {
+    showalert(context, "Fill All the fields", AlertType.warning);
+    return;
+  } else {
+    loginuserdatabase(context, usernamecontroller, passwordcontroller);
+  }
+}
+
+Future<void> loginuserdatabase(
+    BuildContext context,
+    TextEditingController usernamecontroller,
+    TextEditingController passwordcontroller) async {
+  try {
+    showLoadingDialog(context, true);
+    Uri url = Uri.parse("${GlobalVariables.apilink}/User/login");
+    Map<String, dynamic> userData = {
+      "Username": usernamecontroller.text,
+      "Password": passwordcontroller.text,
+    };
+    Response response = await post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(userData),
+    ).timeout(const Duration(seconds: 10));
+
+    if (response.statusCode == 200) {
+      Navigator.of(context, rootNavigator: true).pop();
+      var responseData = jsonDecode(response.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('UserId', responseData['userId'].toString());
+      prefs.setString('Username', usernamecontroller.text);
+      prefs.setString('Token', responseData['token'].toString());
+      prefs.setString('RoleId', responseData["roleId"].toString());
+      showalert(context, "User Logged In", AlertType.success);
+      print(response.body);
+    } else {
+      Navigator.of(context, rootNavigator: true).pop();
+      String error = response.body;
+      showalert(context, error, AlertType.warning);
+    }
+  } on TimeoutException catch (_) {
+    Navigator.of(context, rootNavigator: true).pop();
+    showalert(
+        context, "The request timed out. Please try again.", AlertType.error);
+  } catch (e) {
+    Navigator.of(context, rootNavigator: true).pop();
+    print(e);
+    showalert(context, "Application Encountered an Unhandled Exception",
+        AlertType.error);
+  }
+}
