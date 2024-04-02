@@ -3,9 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:project271/Designs/loadingscreen.dart';
+import 'package:project271/Designs/loadingdesign.dart';
 import 'package:project271/Designs/popupalert.dart';
 import 'package:project271/globalvariables.dart';
+import 'package:project271/screens/HomePage.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -157,8 +158,8 @@ Future<void> loginuserdatabase(
       prefs.setString('Username', usernamecontroller.text);
       prefs.setString('Token', responseData['token'].toString());
       prefs.setString('RoleId', responseData["roleId"].toString());
-      showalert(context, "User Logged In", AlertType.success);
-      print(response.body);
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const HomePage()));
     } else {
       Navigator.of(context, rootNavigator: true).pop();
       String error = response.body;

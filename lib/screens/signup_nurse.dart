@@ -5,9 +5,10 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
-import 'package:project271/Designs/loadingscreen.dart';
+import 'package:project271/Designs/loadingdesign.dart';
 import 'package:project271/Designs/popupalert.dart';
 import 'package:project271/globalvariables.dart';
+import 'package:project271/screens/HomePage.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -180,7 +181,8 @@ class _NursePageState extends State<NursePage> {
         prefs.setString('Username', usernamecontroller.text);
         prefs.setString('Token', responseData['token'].toString());
         prefs.setString('RoleId', '2');
-        showalert(context, "User Registered", AlertType.success);
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const HomePage()));
       } else {
         String error = response.body;
         showalert(context, error, AlertType.warning);

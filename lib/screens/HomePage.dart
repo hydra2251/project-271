@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:project271/screens/adminpage.dart';
+import 'package:project271/screens/advancedsignup.dart';
 
-class ProfileScreenUser extends StatelessWidget {
-  const ProfileScreenUser({Key? key}) : super(key: key);
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,38 +16,40 @@ class ProfileScreenUser extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/user_avatar.png'),
-            ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'John Doe',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
-            Text(
+            const SizedBox(height: 10),
+            const Text(
               'Age: 30',
               style: TextStyle(fontSize: 18),
             ),
-            SizedBox(height: 10),
-            Text(
+            const SizedBox(height: 10),
+            const Text(
               'Email: john.doe@example.com',
               style: TextStyle(fontSize: 18),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Implement edit profile functionality
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AdvancedSignUpPage()),
+                );
               },
-              child: Text('Edit Profile'),
+              child: const Text('Advanced Info'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Implement logout functionality
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AdminPage()),
+                );
               },
-              child: Text('Logout'),
+              child: const Text('Admin Page'),
             ),
           ],
         ),

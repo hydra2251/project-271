@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:project271/globalvariables.dart';
+import 'package:project271/screens/HomePage.dart';
 import 'package:project271/screens/choosesignupoption.dart';
 import 'package:project271/screens/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,11 +42,13 @@ class _LoadingState extends State<Loading> {
           },
         ).timeout(const Duration(seconds: 10));
         if (response.statusCode == 200) {
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => LoginPage())); //
-        } else {
           Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => ChooseSignUpOption())); //
+              MaterialPageRoute(builder: (context) => const HomePage())); //
+        } else {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ChooseSignUpOption())); //
         }
       } on TimeoutException catch (_) {
         Navigator.pushReplacement(
