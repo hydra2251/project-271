@@ -1,14 +1,24 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Added for FilteringTextInputFormatter
+import 'package:http/http.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:project271/Designs/loadingdesign.dart';
+import 'package:project271/Designs/popupalert.dart';
+import 'package:project271/globalvariables.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-Future<CroppedFile?> getCroppedFile(ImageSource imageSource, {bool isSelfie = false}) async {
+Future<CroppedFile?> getCroppedFile(ImageSource imageSource,
+    {bool isSelfie = false}) async {
   final pickedImage = isSelfie
-      ? await ImagePicker().pickImage(source: imageSource, preferredCameraDevice: CameraDevice.front)
+      ? await ImagePicker().pickImage(
+      source: imageSource, preferredCameraDevice: CameraDevice.front)
       : await ImagePicker().pickImage(source: imageSource);
 
   if (pickedImage == null) return null;
@@ -65,6 +75,7 @@ class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController dobController;
   late TextEditingController nationalityController;
   late TextEditingController locationController;
+  late TextEditingController bioController;
   late TextEditingController experienceController;
   late TextEditingController expertiseController;
   late TextEditingController hourlyPriceController;
@@ -76,12 +87,17 @@ class _SignUpPageState extends State<SignUpPage> {
   String nationality = '';
   String location = '';
   String experience = '';
+  String bio = '';
   String expertise = '';
   String hourlyPrice = '';
   String dailyPrice = '';
   String weeklyPrice = '';
-  File? _image;
-  String? _imageBase64;
+  CroppedFile? passportimage;
+  CroppedFile? idFrontImage;
+  CroppedFile? idBackimage;
+  String? passportbase64;
+  String? idfrontimagebase64;
+  String? idbackimagebase64;
 
   List<String> expertiseOptions = [
     'Cardiology',
@@ -100,6 +116,7 @@ class _SignUpPageState extends State<SignUpPage> {
     dobController = TextEditingController();
     nationalityController = TextEditingController();
     locationController = TextEditingController();
+    bioController = TextEditingController();
     experienceController = TextEditingController();
     expertiseController = TextEditingController();
     hourlyPriceController = TextEditingController();
@@ -118,26 +135,8 @@ class _SignUpPageState extends State<SignUpPage> {
     hourlyPriceController.dispose();
     dailyPriceController.dispose();
     weeklyPriceController.dispose();
+    bioController.dispose();
     super.dispose();
-  }
-
-  Future<void> _getImageFromCamera(ImageSource source, {bool isSelfie = false, bool isFrontId = false, bool isBackId = false}) async {
-    CroppedFile? croppedFile = await getCroppedFile(source, isSelfie: isSelfie);
-    if (croppedFile != null) {
-      setState(() {
-        _image = File(croppedFile.path);
-        _imageBase64 = convertImageToBase64(croppedFile);
-      });
-
-      // Check if the image is for front ID or back ID and handle accordingly
-      if (isFrontId) {
-        // Handle front ID image
-        // You can store or process the front ID image here
-      } else if (isBackId) {
-        // Handle back ID image
-        // You can store or process the back ID image here
-      }
-    }
   }
 
   void nextStep() {
@@ -154,461 +153,645 @@ class _SignUpPageState extends State<SignUpPage> {
     });
   }
 
+  void checkifstep1iscomplete() {
+    if (dobController.text.isNotEmpty &&
+        locationController.text.isNotEmpty &&
+        nationalityController.text.isNotEmpty &&
+        experienceController.text.isNotEmpty &&
+        expertiseController.text.isNotEmpty) {
+      isStep1Completed = true;
+    } else {
+      isStep1Completed = false;
+    }
+  }
+
+  void checkIfStep2IsComplete() {
+    // Step 2 is considered complete if the passport image is not null, OR both ID front and back images are not null.
+    // If only one of the ID images is uploaded, the user is required to upload the other one.
+    if (passportimage != null) {
+      isStep2Completed = true;
+    }
+    if (passportimage != null && idFrontImage == null && idBackimage != null) {
+      isStep2Completed = false;
+    }
+    if (passportimage != null && idFrontImage != null && idBackimage == null) {
+      isStep2Completed = false;
+    }
+    if (idFrontImage != null && idBackimage != null) {
+      isStep2Completed = true;
+    }
+  }
+
+  void checkifstep3iscomplete() {
+    if (hourlyPriceController.text.isNotEmpty &&
+        weeklyPriceController.text.isNotEmpty &&
+        dailyPriceController.text.isNotEmpty) {
+      isStep3Completed = true;
+    } else {
+      isStep3Completed = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-        title: Text('Get verification'),
-    leading: IconButton(
-    icon: Icon(Icons.arrow_back),
-    onPressed: widget.goBack,
-    ),
-    ),
-    body: SingleChildScrollView(
-    child:
-    Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-        // Steps indicator
-        Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          for (int i = 1; i <= 3; i++)
-            Column(
-              children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: currentStep >= i ? Colors.blue : Colors.grey,
-                  ),
-                ),
-                if (i < 3)
-                  Container(
-                    width: 2,
-                    height: 20,
-                    color: currentStep > i ? Colors.blue : Colors.grey,
-                  ),
-              ],
-            ),
-        ],
+      appBar: AppBar(
+        title: const Text('Get verification'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: widget.goBack,
+        ),
       ),
-      SizedBox(width: 20),
-      Expanded(
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            // Form fields for each step
-            if (currentStep == 1) ...[
-      ExpansionTile(
-      title: Semantics(
-      label: 'Personal Information',
-        hint: 'Enter your personal information',
-        child: Text('Personal Information'),
-      ),
-      childrenPadding: EdgeInsets.zero,
-      children: [
-        ListTile(
-          title: Semantics(
-            label: 'Nurse ID',
-            hint: 'Enter your nurse ID (numbers only)',
-            child: TextField(
-              controller: nurseIdController,
-              decoration: InputDecoration(
-                labelText: 'Enter Nurse ID',
-              ),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  nurseId = value;
-                  isStep1Completed = value.isNotEmpty;
-                });
-              },
-            ),
-          ),
-        ),
-        ListTile(
-          title: Semantics(
-            label: 'Date of Birth',
-            hint: 'Enter your date of birth',
-            child: TextField(
-              controller: dobController,
-              decoration: InputDecoration(
-                labelText: 'Enter Date of Birth',
-              ),
-              readOnly: true,
-              onTap: () async {
-                // Open a date picker dialog
-                final selectedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime.now(),
-                );
-                if (selectedDate != null) {
-                  setState(() {
-                    dob = selectedDate.toString();
-                    dobController.text = dob;
-                    isStep1Completed = true;
-                  });
-                }
-              },
-            ),
-          ),
-        ),
-        ListTile(
-          title: Semantics(
-            label: 'Nationality',
-            hint: 'Select your nationality',
-            child: TextField(
-              controller: nationalityController,
-              decoration: InputDecoration(
-                labelText: 'Select Nationality',
-              ),
-              readOnly: true,
-              onTap: () async {
-                // Open a dropdown for selecting nationality
-                final selectedNationality = await showDialog<String>(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Select Nationality'),
-                      content: DropdownButton<String>(
-                        items: <String>[
-                          'Albanian',
-                          // Add more nationalities as needed
-                          'American',
-                          'British',
-                          'Canadian',
-                          // Add more nationalities as needed
-                        ].map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (String? value) {
-                          Navigator.pop(context, value);
-                        },
-                      ),
-                    );
-                  },
-                );
-                if (selectedNationality != null) {
-                  setState(() {
-                    nationality = selectedNationality;
-                    nationalityController.text = nationality;
-                    isStep1Completed = true;
-                  });
-                }
-              },
-            ),
-          ),
-        ),
-        ListTile(
-          title: Semantics(
-            label: 'Location',
-            hint: 'Enter your location',
-            child: TextField(
-              controller: locationController,
-              decoration: InputDecoration(
-                labelText: 'Enter Location',
-              ),
-              onChanged: (value) {
-                setState(() {
-                  location = value;
-                  isStep1Completed = true;
-                });
-              },
-            ),
-          ),
-        ),
-      ],
-    ),
-        ElevatedButton(
-          onPressed: isStep1Completed ? nextStep : null,
-          child: Text('Next'),
-        ),
-        ] else if (currentStep == 2) ...[
-    ExpansionTile(
-    title: Semantics(
-    label: 'Uploading Info',
-      hint: 'Upload your information',
-      child: Text('Uploading Info'),
-    ),
-    childrenPadding: EdgeInsets.zero,
-    children: [
-    ListTile(
-    title: Semantics(
-    label: 'Years of Experience',
-    hint: 'Enter your years of experience',
-    child: TextField(
-    controller: experienceController,
-    decoration: InputDecoration(
-    labelText: 'Years of Experience',
-    ),
-    keyboardType: TextInputType.number,
-    onChanged: (value) {
-    setState(() {
-    experience = value;
-    isStep2Completed = value.isNotEmpty;
-    });
-    },
-    ),
-    ),
-    ),
-    ListTile(
-    title: Semantics(
-    label: 'Expertise',
-    hint: 'Select your expertise',
-    child: TextField(
-    controller: expertiseController,
-    decoration: InputDecoration(
-    labelText: 'Select Expertise',
-    ),
-    readOnly: true,
-    onTap: () async {
-    // Open a dropdown for selecting expertise
-    final selectedExpertise = await showDialog<String>(
-    context: context,
-    builder: (BuildContext context) {
-    return AlertDialog(
-    title: Text('Select your Expertise'),
-    content: DropdownButton<String>(
-    items: expertiseOptions.map((String value) {
-    return DropdownMenuItem<String>(
-    value: value,
-    child: Text(value),
-    );
-    }).toList(),
-    onChanged: (String? value) {
-    Navigator.pop(context, value);
-    },
-    ),
-    );
-    },
-    );
-    if (selectedExpertise != null) {
-    setState(() {
-    expertise = selectedExpertise;
-    expertiseController.text = expertise;
-    isStep2Completed = true;
-    });
-    }
-    },
-    ),
-    ),
-    ),
-    ListTile(
-    leading: _image == null
-    ? Icon(
-    Icons.account_circle,
-    size: 40,
-    )
-        : ClipOval(
-    child: Image.file(
-    _image!,
-    height: 80,
-    width: 80,
-    fit: BoxFit.cover,
-    ),
-    ),
-    title: TextButton.icon(
-    onPressed: () {
-    _getImageFromCamera(
-    ImageSource.camera,
-    isSelfie: true,
-    );
-    },
-    icon: Icon(
-    Icons.camera_alt,
-    size: 16,
-    ),
-    label: Text(
-    'capture your passport',
-    ),
-    ),
-    onTap: () {
-    _getImageFromCamera(
-    ImageSource.camera,
-    isSelfie: true,
-    );
-    },
-    ),
-    ListTile(
-    leading: _image == null
-    ? Icon(
-    Icons.account_circle,
-    size: 40,
-    )
-        : ClipOval(
-    child: Image.file(
-    _image!,
-    height: 80,
-    width: 80,
-    fit: BoxFit.cover,
-    ),
-    ),
-    title: TextButton.icon(
-    onPressed: () {
-    _getImageFromCamera(
-    ImageSource.camera,
-    isSelfie: true,
-    isFrontId: true,
-    );
-    },
-    icon: Icon(
-      Icons.camera_alt,
-      size: 16,
-    ),
-      label: Text(
-        'Capture Front ID',
-      ),
-    ),
-      onTap: () {
-        _getImageFromCamera(
-          ImageSource.camera,
-          isSelfie: true,
-          isFrontId: true,
-        );
-      },
-    ),
-      ListTile(
-        leading: _image == null
-            ? Icon(
-          Icons.account_circle,
-          size: 40,
-        )
-            : ClipOval(
-          child: Image.file(
-            _image!,
-            height: 80,
-            width: 80,
-            fit: BoxFit.cover,
-          ),
-        ),
-        title: TextButton.icon(
-          onPressed: () {
-            _getImageFromCamera(
-              ImageSource.camera,
-              isSelfie: true,
-              isBackId: true,
-            );
-          },
-          icon: Icon(
-            Icons.camera_alt,
-            size: 16,
-          ),
-          label: Text(
-            'Capture Back ID',
-          ),
-        ),
-        onTap: () {
-          _getImageFromCamera(
-            ImageSource.camera,
-            isSelfie: true,
-            isBackId: true,
-          );
-        },
-      ),
-    ],
-    ),
-              ElevatedButton(
-                onPressed: isStep2Completed ? nextStep : null,
-                child: Text('Next'),
-              ),
-            ] else if (currentStep == 3) ...[
-              ExpansionTile(
-                title: Semantics(
-                  label: 'Pricing Information',
-                  hint: 'Enter your pricing information',
-                  child: Text('Pricing Information'),
-                ),
-                childrenPadding: EdgeInsets.zero,
+              // Steps indicator
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  ListTile(
-                    title: Semantics(
-                      label: 'Hourly Price',
-                      hint: 'Enter your hourly price',
-                      child: TextField(
-                        controller: hourlyPriceController,
-                        decoration: InputDecoration(
-                          labelText: 'Hourly Price',
+                  for (int i = 1; i <= 3; i++)
+                    Column(
+                      children: [
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: currentStep >= i ? Colors.blue : Colors.grey,
+                          ),
                         ),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            hourlyPrice = value;
-                          });
-                        },
-                      ),
+                        if (i < 3)
+                          Container(
+                            width: 2,
+                            height: 20,
+                            color: currentStep > i ? Colors.blue : Colors.grey,
+                          ),
+                      ],
                     ),
-                  ),
-                  ListTile(
-                    title: Semantics(
-                      label: 'Daily Price',
-                      hint: 'Enter your daily price',
-                      child: TextField(
-                        controller: dailyPriceController,
-                        decoration: InputDecoration(
-                          labelText: 'Daily Price',
-                        ),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            dailyPrice = value;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: Semantics(
-                      label: 'Weekly Price',
-                      hint: 'Enter your weekly price',
-                      child: TextField(
-                        controller: weeklyPriceController,
-                        decoration: InputDecoration(
-                          labelText: 'Weekly Price',
-                        ),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            weeklyPrice = value;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
                 ],
               ),
-              ElevatedButton(
-                onPressed: () {
-                  // Handle submission of the form, e.g., send data to server
-                },
-                child: Text('Submit'),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Form fields for each step
+                    if (currentStep == 1) ...[
+                      ExpansionTile(
+                        title: Semantics(
+                          label: 'Personal Information',
+                          hint: 'Enter your personal information',
+                          child: const Text('Personal Information'),
+                        ),
+                        childrenPadding: EdgeInsets.zero,
+                        children: [
+                          ListTile(
+                            title: Semantics(
+                              label: 'Date of Birth',
+                              hint: 'Enter your date of birth',
+                              child: TextField(
+                                controller: dobController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Enter Date of Birth',
+                                ),
+                                readOnly: true,
+                                onTap: () async {
+                                  // Open a date picker dialog
+                                  final selectedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(1900),
+                                    lastDate: DateTime.now(),
+                                  );
+                                  if (selectedDate != null) {
+                                    setState(() {
+                                      dobController.text =
+                                          DateFormat('dd-MM-yyyy')
+                                              .format(selectedDate);
+                                      checkifstep1iscomplete();
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                          ListTile(
+                            title: Semantics(
+                              label: 'Nationality',
+                              hint: 'Select your nationality',
+                              child: TextField(
+                                controller: nationalityController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Select Nationality',
+                                ),
+                                readOnly: true,
+                                onTap: () async {
+                                  // Open a dropdown for selecting nationality
+                                  final selectedNationality =
+                                  await showDialog<String>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Select Nationality'),
+                                        content: DropdownButton<String>(
+                                          items: <String>[
+                                            'Lebanese',
+                                            'American',
+                                            'British',
+                                            'Canadian',
+                                            // Add more nationalities as needed
+                                          ].map((String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(value),
+                                            );
+                                          }).toList(),
+                                          onChanged: (String? value) {
+                                            Navigator.pop(context, value);
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  );
+                                  if (selectedNationality != null) {
+                                    setState(() {
+                                      nationality = selectedNationality;
+                                      nationalityController.text = nationality;
+                                      checkifstep1iscomplete();
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                          ListTile(
+                            title: Semantics(
+                              label: 'Location',
+                              hint: 'Enter your location',
+                              child: TextField(
+                                controller: locationController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Enter Location',
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    location = value;
+                                    checkifstep1iscomplete();
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          ListTile(
+                            title: Semantics(
+                              label: 'Years of Experience',
+                              hint: 'Enter your years of experience',
+                              child: TextField(
+                                controller: experienceController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Years of Experience',
+                                ),
+                                keyboardType: TextInputType.number,
+                                onChanged: (value) {
+                                  setState(() {
+                                    experience = value;
+                                    checkifstep1iscomplete();
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          ListTile(
+                            title: Semantics(
+                              label: 'Bio',
+                              hint: 'Tell us about you',
+                              child: TextField(
+                                controller: bioController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Bio',
+                                ),
+                                keyboardType: TextInputType.text,
+                                onChanged: (value) {
+                                  setState(() {
+                                    bio = value;
+                                    checkifstep1iscomplete();
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+
+                          ListTile(
+                            title: Semantics(
+                              label: 'Expertise',
+                              hint: 'Select your expertise',
+                              child: TextField(
+                                controller: expertiseController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Select Expertise',
+                                ),
+                                readOnly: true,
+                                onTap: () async {
+                                  // Open a dropdown for selecting expertise
+                                  final selectedExpertise =
+                                  await showDialog<String>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title:
+                                        const Text('Select your Expertise'),
+                                        content: DropdownButton<String>(
+                                          items: expertiseOptions
+                                              .map((String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(value),
+                                            );
+                                          }).toList(),
+                                          onChanged: (String? value) {
+                                            Navigator.pop(context, value);
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  );
+                                  if (selectedExpertise != null) {
+                                    setState(() {
+                                      expertise = selectedExpertise;
+                                      expertiseController.text = expertise;
+                                      checkifstep1iscomplete();
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      ElevatedButton(
+                        onPressed: isStep1Completed ? nextStep : null,
+                        child: const Text('Next'),
+                      ),
+                    ] else if (currentStep == 2) ...[
+                      ExpansionTile(
+                        title: Semantics(
+                          label: 'Upload Verification Images',
+                          hint: 'Upload your information',
+                          child: const Text('Uploading Info'),
+                        ),
+                        childrenPadding: EdgeInsets.zero,
+                        children: [
+                          ListTile(
+                            leading: passportimage != null
+                                ? SizedBox(
+                              height: 150,
+                              width: 150,
+                              child:
+                              Image.file(File(passportimage!.path)),
+                            )
+                                : const SizedBox(),
+                            title: TextButton.icon(
+                              onPressed: () {
+                                showImagePickerOption(
+                                  context,
+                                  0,
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.image,
+                                size: 16,
+                              ),
+                              label: const Text(
+                                'Choose passport Image',
+                              ),
+                            ),
+                            onTap: () {
+                              showImagePickerOption(
+                                context,
+                                0,
+                              );
+                            },
+                          ),
+                          ListTile(
+                            leading: idFrontImage != null
+                                ? SizedBox(
+                              height: 150,
+                              width: 150,
+                              child: Image.file(File(idFrontImage!.path)),
+                            )
+                                : const SizedBox(),
+                            title: TextButton.icon(
+                              onPressed: () {
+                                showImagePickerOption(context, 1);
+                              },
+                              icon: const Icon(
+                                Icons.image,
+                                size: 16,
+                              ),
+                              label: const Text(
+                                'Choose Front ID Image',
+                              ),
+                            ),
+                            onTap: () {
+                              showImagePickerOption(context, 1);
+                            },
+                          ),
+                          ListTile(
+                            leading: idBackimage != null
+                                ? SizedBox(
+                              height: 150,
+                              width: 150,
+                              child: Image.file(File(idBackimage!.path)),
+                            )
+                                : const SizedBox(),
+                            title: TextButton.icon(
+                              onPressed: () {
+                                showImagePickerOption(context, 2);
+                              },
+                              icon: const Icon(
+                                Icons.image,
+                                size: 16,
+                              ),
+                              label: const Text(
+                                'Choose Back Id Image',
+                              ),
+                            ),
+                            onTap: () {
+                              showImagePickerOption(
+                                context,
+                                2,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: isStep2Completed ? nextStep : null,
+                              child: const Text('Next'),
+                            ),
+                          ),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: previousStep,
+                              child: const Text('Back'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else if (currentStep == 3) ...[
+                      ExpansionTile(
+                        title: Semantics(
+                          label: 'Pricing Information',
+                          hint: 'Enter your pricing information',
+                          child: const Text('Pricing Information'),
+                        ),
+                        childrenPadding: EdgeInsets.zero,
+                        children: [
+                          ListTile(
+                            title: Semantics(
+                              label: 'Hourly Price',
+                              hint: 'Enter your hourly price',
+                              child: TextField(
+                                controller: hourlyPriceController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Hourly Price',
+                                ),
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'^\d+\.?\d{0,2}')),
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    hourlyPrice = value;
+                                    checkifstep3iscomplete();
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          ListTile(
+                            title: Semantics(
+                              label: 'Daily Price',
+                              hint: 'Enter your daily price',
+                              child: TextField(
+                                controller: dailyPriceController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Daily Price',
+                                ),
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'^\d+\.?\d{0,2}')),
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    dailyPrice = value;
+                                    checkifstep3iscomplete();
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          ListTile(
+                            title: Semantics(
+                              label: 'Weekly Price',
+                              hint: 'Enter your weekly price',
+                              child: TextField(
+                                controller: weeklyPriceController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Weekly Price',
+                                ),
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'^\d+\.?\d{0,2}')),
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    weeklyPrice = value;
+                                    checkifstep3iscomplete();
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: isStep3Completed == false
+                                  ? null
+                                  : uploadadvancedinfo,
+                              child: const Text('Submit'),
+                            ),
+                          ),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: previousStep,
+                              child: const Text('Back'),
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ],
-            ],
+          ),
         ),
       ),
-        ],
-      ),
-    ),
-    ),
     );
   }
-}
 
+  void uploadadvancedinfo() async {
+    showLoadingDialog(context, true);
+    if (passportimage != null) {
+      passportbase64 = convertimagetobase64(passportimage);
+    }
+    if (idFrontImage != null) {
+      idfrontimagebase64 = convertimagetobase64(passportimage);
+    }
+    if (idBackimage != null) {
+      idbackimagebase64 = convertimagetobase64(passportimage);
+    }
+    try {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      Uri url = Uri.parse("${GlobalVariables.apilink}/User/uploadadvancedinfo");
+      Map<String, dynamic> userData = {
+        "nurseId": int.tryParse(preferences.getString("UserId").toString()),
+        "dateofBirth": dobController.text,
+        "nationality": nationalityController.text,
+        "location": locationController.text,
+        "yearsOfExperience": experienceController.text,
+        "bio": 'bio',
+        "expertise": experienceController.text,
+        "passportimage": passportbase64,
+        "idFrontImage": idfrontimagebase64,
+        "idBackImage": passportbase64,
+        "hourlyPrice": double.tryParse(hourlyPriceController.text),
+        "dailyPrice": double.tryParse(dailyPriceController.text),
+        "weeklyPrice": double.tryParse(weeklyPriceController.text)
+      };
+      Response response = await post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(userData),
+      ).timeout(const Duration(minutes: 1));
+      if (response.statusCode == 200) {
+        Navigator.of(context, rootNavigator: true).pop();
+        showalert(context, "Advanced Info Uploaded", AlertType.success);
+      }
+    } on TimeoutException catch (_) {
+      Navigator.of(context, rootNavigator: true).pop();
+      showalert(
+          context, "The request timed out. Please try again.", AlertType.error);
+    } catch (e) {
+      Navigator.of(context, rootNavigator: true).pop();
+      print(e);
+      showalert(context, "Application Encountered an Unhandled Exception",
+          AlertType.error);
+    }
+  }
+
+  String convertimagetobase64(CroppedFile? croppedFile) {
+    Uint8List image = File(croppedFile!.path).readAsBytesSync();
+    String base64string = base64Encode(image);
+    return base64string;
+  }
+
+  showImagePickerOption(BuildContext context, int imagetype) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) => Container(
+          height: 200,
+          color: Colors.blue,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 50),
+            child: Row(
+              children: [
+                Expanded(
+                    child: InkWell(
+                      onTap: () =>
+                          pickimage(context, ImageSource.gallery, imagetype),
+                      child: const SizedBox(
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.image,
+                              size: 70,
+                            ),
+                            Text("Gallery")
+                          ],
+                        ),
+                      ),
+                    )),
+                Expanded(
+                    child: InkWell(
+                      onTap: () =>
+                          pickimage(context, ImageSource.camera, imagetype),
+                      child: const SizedBox(
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.camera_alt_outlined,
+                              size: 70,
+                            ),
+                            Text("Camera")
+                          ],
+                        ),
+                      ),
+                    )),
+              ],
+            ),
+          ),
+        ));
+  }
+
+  Future<void> pickimage(
+      BuildContext context, ImageSource imageSource, int imagetype) async {
+    CroppedFile? file = await getcroppedfile(imageSource);
+
+    if (file == null) {
+      return;
+    }
+    if (imagetype == 0) {
+      passportimage = file;
+    }
+    if (imagetype == 1) {
+      idFrontImage = file;
+    }
+    if (imagetype == 2) {
+      idBackimage = file;
+    }
+    checkIfStep2IsComplete();
+    setState(() {});
+  }
+
+  Future<CroppedFile?> getcroppedfile(ImageSource imageSource,
+      {bool isSelfie = false}) async {
+    final returnimage = isSelfie == false
+        ? await ImagePicker().pickImage(source: imageSource)
+        : await ImagePicker().pickImage(
+        source: imageSource, preferredCameraDevice: CameraDevice.front);
+    if (returnimage == null) return null;
+    CroppedFile? cropppedfile = await ImageCropper().cropImage(
+      sourcePath: returnimage.path,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.square,
+      ],
+    );
+    return cropppedfile;
+  }
+}

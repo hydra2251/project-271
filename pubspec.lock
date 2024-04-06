@@ -126,14 +126,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_dropdown_search:
-    dependency: "direct main"
-    description:
-      name: flutter_dropdown_search
-      sha256: "6d245cec7bc0185331144182e1d1e2e0106f9cf06d426d1433d281538fc4022c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.4"
   flutter_lints:
     dependency: "direct dev"
     description:
