@@ -1,11 +1,18 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
+import 'package:project271/Designs/loadingdesign.dart';
 import 'package:project271/Designs/popupalert.dart';
+import 'package:project271/globalvariables.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChooseAvailableDates extends StatefulWidget {
-  const ChooseAvailableDates({super.key});
+  const ChooseAvailableDates({Key? key}) : super(key: key);
 
   @override
   State<ChooseAvailableDates> createState() => _ChooseAvailableDatesState();
@@ -13,7 +20,20 @@ class ChooseAvailableDates extends StatefulWidget {
 
 class _ChooseAvailableDatesState extends State<ChooseAvailableDates> {
   final TextEditingController _dateController = TextEditingController();
-  final List<String> _dates = [];
+  late List<String> _dates = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAvailableDates();
+  }
+
+  Future<void> _loadAvailableDates() async {
+    List<String> dates = await getAvailableDates(context);
+    setState(() {
+      _dates = dates;
+    });
+  }
 
   void _addDate() {
     if (_dateController.text.isNotEmpty) {
@@ -85,10 +105,25 @@ class _ChooseAvailableDatesState extends State<ChooseAvailableDates> {
               },
             ),
           ),
-          if (_dates.isNotEmpty)
-            Expanded(
-                child:
-                    TextButton(onPressed: () => {}, child: const Text("Save"))),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 200.0),
+            child: MaterialButton(
+              minWidth: 200, // Adjust the width as needed
+              height: 50,
+              color: Colors.blueAccent,
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(12.0), // Adjust the radius as needed
+              ),
+              onPressed: () => saveAvailableDates(context, _dates),
+              child: const Text(
+                "Save",
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -97,12 +132,18 @@ class _ChooseAvailableDatesState extends State<ChooseAvailableDates> {
   void gettime() async {
     List<DateTime>? dateTimeList = await showOmniDateTimeRangePicker(
       context: context,
-      startInitialDate: DateTime.now(),
-      startFirstDate: DateTime(1600).subtract(const Duration(days: 3652)),
-      startLastDate: DateTime.now().add(const Duration(days: 3652)),
-      endInitialDate: DateTime.now(),
-      endFirstDate: DateTime(1600).subtract(const Duration(days: 3652)),
-      endLastDate: DateTime.now().add(const Duration(days: 3652)),
+      startInitialDate: DateTime.now().add(const Duration(days: 1)),
+      startFirstDate: DateTime.now().add(const Duration(days: 1)),
+      startLastDate: DateTime.now().add(const Duration(days: 30)),
+      endInitialDate: DateTime.now()
+          .add(const Duration(days: 1))
+          .add(const Duration(hours: 1)),
+      endFirstDate: DateTime.now()
+          .add(const Duration(days: 1))
+          .add(const Duration(hours: 1)),
+      endLastDate: DateTime.now()
+          .add(const Duration(days: 30))
+          .add(const Duration(hours: 1)),
       is24HourMode: false,
       isShowSeconds: false,
       minutesInterval: 1,
@@ -122,6 +163,10 @@ class _ChooseAvailableDatesState extends State<ChooseAvailableDates> {
     if (dateTimeList != null) {
       DateTime newStart = dateTimeList[0];
       DateTime newEnd = dateTimeList[1];
+      if (newEnd.isBefore(newStart)) {
+        showalert(context, "Start date is after end date", AlertType.error);
+        return;
+      }
       bool hasOverlap = false;
 
       for (String range in _dates) {
@@ -154,5 +199,71 @@ class _ChooseAvailableDatesState extends State<ChooseAvailableDates> {
   void dispose() {
     _dateController.dispose();
     super.dispose();
+  }
+}
+
+Future<void> saveAvailableDates(
+  BuildContext context,
+  List<String> dates,
+) async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    showLoadingDialog(context, true);
+    Uri url = Uri.parse("${GlobalVariables.apilink}/User/saveavailabledates");
+    int? userId = int.tryParse(prefs.getString("UserId") ?? '');
+    Map<String, dynamic> userData = {
+      "NurseId": userId,
+      "AvailableDates": dates.isNotEmpty ? dates.join(",") : "",
+    };
+    Response response = await post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(userData),
+    ).timeout(const Duration(minutes: 1));
+
+    if (response.statusCode == 200) {
+      Navigator.of(context, rootNavigator: true).pop();
+      showalert(context, "Dates Saved Successfully", AlertType.success);
+    } else {
+      Navigator.of(context, rootNavigator: true).pop();
+      String error = response.body;
+      showalert(context, error, AlertType.warning);
+    }
+  } on TimeoutException catch (_) {
+    Navigator.of(context, rootNavigator: true).pop();
+    showalert(
+        context, "The request timed out. Please try again.", AlertType.error);
+  } catch (e) {
+    Navigator.of(context, rootNavigator: true).pop();
+    print(e);
+    showalert(context, "Application Encountered an Unhandled Exception",
+        AlertType.error);
+  }
+}
+
+Future<List<String>> getAvailableDates(BuildContext context) async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString("UserId");
+    int? id = int.tryParse(userId ?? '');
+    if (id != null) {
+      Uri url = Uri.parse(
+          "${GlobalVariables.apilink}/User/getavailabledates?nurseid=$id");
+      Response response = await get(
+        url,
+        headers: {"Content-Type": "application/json"},
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> responseBody = jsonDecode(response.body);
+        List<String> dates = responseBody.cast<String>();
+        return dates;
+      }
+    }
+    return [];
+  } on TimeoutException catch (_) {
+    return [];
+  } catch (e) {
+    print(e);
+    return [];
   }
 }
