@@ -2,10 +2,9 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart'; // Added for FilteringTextInputFormatter
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_dropdown_search/flutter_dropdown_search.dart';
 
 Future<CroppedFile?> getCroppedFile(ImageSource imageSource, {bool isSelfie = false}) async {
   final pickedImage = isSelfie
@@ -91,6 +90,7 @@ class _SignUpPageState extends State<SignUpPage> {
     'Oncology',
     'Pediatrics',
     'Geriatrics',
+    'Many',
   ];
 
   @override
