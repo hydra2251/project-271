@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Added for FilteringTextInputFormatter
+import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -370,6 +370,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               hint: 'Tell us about you',
                               child: TextField(
                                 controller: bioController,
+                                maxLines: null,
                                 decoration: const InputDecoration(
                                   labelText: 'Bio',
                                 ),
@@ -675,8 +676,8 @@ class _SignUpPageState extends State<SignUpPage> {
         "nationality": nationalityController.text,
         "location": locationController.text,
         "yearsOfExperience": experienceController.text,
-        "bio": 'bio',
-        "expertise": experienceController.text,
+        "bio": bioController.text,
+        "expertise": expertiseController.text,
         "passportimage": passportbase64,
         "idFrontImage": idfrontimagebase64,
         "idBackImage": passportbase64,
