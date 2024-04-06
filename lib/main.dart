@@ -11,7 +11,7 @@ void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     routes: {
-      '/': (context) => const AdminPage(),
+      '/': (context) => const ChooseAvailableDates(),
     },
   ));
 }

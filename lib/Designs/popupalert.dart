@@ -14,7 +14,6 @@ void showalert(
           style: TextStyle(color: Colors.white, fontSize: 20),
         ),
         onPressed: () {
-          // Use the context provided by Alert to pop the dialog
           Navigator.of(context, rootNavigator: true).pop();
         },
         width: 120,
