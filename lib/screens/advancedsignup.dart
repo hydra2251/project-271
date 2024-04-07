@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Added for FilteringTextInputFormatter
+import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,7 +18,7 @@ Future<CroppedFile?> getCroppedFile(ImageSource imageSource,
     {bool isSelfie = false}) async {
   final pickedImage = isSelfie
       ? await ImagePicker().pickImage(
-          source: imageSource, preferredCameraDevice: CameraDevice.front)
+      source: imageSource, preferredCameraDevice: CameraDevice.front)
       : await ImagePicker().pickImage(source: imageSource);
 
   if (pickedImage == null) return null;
@@ -75,6 +75,7 @@ class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController dobController;
   late TextEditingController nationalityController;
   late TextEditingController locationController;
+  late TextEditingController bioController;
   late TextEditingController experienceController;
   late TextEditingController expertiseController;
   late TextEditingController hourlyPriceController;
@@ -86,6 +87,7 @@ class _SignUpPageState extends State<SignUpPage> {
   String nationality = '';
   String location = '';
   String experience = '';
+  String bio = '';
   String expertise = '';
   String hourlyPrice = '';
   String dailyPrice = '';
@@ -114,6 +116,7 @@ class _SignUpPageState extends State<SignUpPage> {
     dobController = TextEditingController();
     nationalityController = TextEditingController();
     locationController = TextEditingController();
+    bioController = TextEditingController();
     experienceController = TextEditingController();
     expertiseController = TextEditingController();
     hourlyPriceController = TextEditingController();
@@ -132,6 +135,7 @@ class _SignUpPageState extends State<SignUpPage> {
     hourlyPriceController.dispose();
     dailyPriceController.dispose();
     weeklyPriceController.dispose();
+    bioController.dispose();
     super.dispose();
   }
 
@@ -287,7 +291,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 onTap: () async {
                                   // Open a dropdown for selecting nationality
                                   final selectedNationality =
-                                      await showDialog<String>(
+                                  await showDialog<String>(
                                     context: context,
                                     builder: (BuildContext context) {
                                       return AlertDialog(
@@ -362,6 +366,27 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                           ListTile(
                             title: Semantics(
+                              label: 'Bio',
+                              hint: 'Tell us about you',
+                              child: TextField(
+                                controller: bioController,
+                                maxLines: null,
+                                decoration: const InputDecoration(
+                                  labelText: 'Bio',
+                                ),
+                                keyboardType: TextInputType.text,
+                                onChanged: (value) {
+                                  setState(() {
+                                    bio = value;
+                                    checkifstep1iscomplete();
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+
+                          ListTile(
+                            title: Semantics(
                               label: 'Expertise',
                               hint: 'Select your expertise',
                               child: TextField(
@@ -373,12 +398,12 @@ class _SignUpPageState extends State<SignUpPage> {
                                 onTap: () async {
                                   // Open a dropdown for selecting expertise
                                   final selectedExpertise =
-                                      await showDialog<String>(
+                                  await showDialog<String>(
                                     context: context,
                                     builder: (BuildContext context) {
                                       return AlertDialog(
                                         title:
-                                            const Text('Select your Expertise'),
+                                        const Text('Select your Expertise'),
                                         content: DropdownButton<String>(
                                           items: expertiseOptions
                                               .map((String value) {
@@ -423,11 +448,11 @@ class _SignUpPageState extends State<SignUpPage> {
                           ListTile(
                             leading: passportimage != null
                                 ? SizedBox(
-                                    height: 150,
-                                    width: 150,
-                                    child:
-                                        Image.file(File(passportimage!.path)),
-                                  )
+                              height: 150,
+                              width: 150,
+                              child:
+                              Image.file(File(passportimage!.path)),
+                            )
                                 : const SizedBox(),
                             title: TextButton.icon(
                               onPressed: () {
@@ -454,10 +479,10 @@ class _SignUpPageState extends State<SignUpPage> {
                           ListTile(
                             leading: idFrontImage != null
                                 ? SizedBox(
-                                    height: 150,
-                                    width: 150,
-                                    child: Image.file(File(idFrontImage!.path)),
-                                  )
+                              height: 150,
+                              width: 150,
+                              child: Image.file(File(idFrontImage!.path)),
+                            )
                                 : const SizedBox(),
                             title: TextButton.icon(
                               onPressed: () {
@@ -478,10 +503,10 @@ class _SignUpPageState extends State<SignUpPage> {
                           ListTile(
                             leading: idBackimage != null
                                 ? SizedBox(
-                                    height: 150,
-                                    width: 150,
-                                    child: Image.file(File(idBackimage!.path)),
-                                  )
+                              height: 150,
+                              width: 150,
+                              child: Image.file(File(idBackimage!.path)),
+                            )
                                 : const SizedBox(),
                             title: TextButton.icon(
                               onPressed: () {
@@ -651,8 +676,8 @@ class _SignUpPageState extends State<SignUpPage> {
         "nationality": nationalityController.text,
         "location": locationController.text,
         "yearsOfExperience": experienceController.text,
-        "bio": 'bio',
-        "expertise": experienceController.text,
+        "bio": bioController.text,
+        "expertise": expertiseController.text,
         "passportimage": passportbase64,
         "idFrontImage": idfrontimagebase64,
         "idBackImage": passportbase64,
@@ -691,14 +716,14 @@ class _SignUpPageState extends State<SignUpPage> {
     showModalBottomSheet(
         context: context,
         builder: (context) => Container(
-              height: 200,
-              color: Colors.blue,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 50),
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: InkWell(
+          height: 200,
+          color: Colors.blue,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 50),
+            child: Row(
+              children: [
+                Expanded(
+                    child: InkWell(
                       onTap: () =>
                           pickimage(context, ImageSource.gallery, imagetype),
                       child: const SizedBox(
@@ -713,8 +738,8 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     )),
-                    Expanded(
-                        child: InkWell(
+                Expanded(
+                    child: InkWell(
                       onTap: () =>
                           pickimage(context, ImageSource.camera, imagetype),
                       child: const SizedBox(
@@ -729,10 +754,10 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     )),
-                  ],
-                ),
-              ),
-            ));
+              ],
+            ),
+          ),
+        ));
   }
 
   Future<void> pickimage(
@@ -760,7 +785,7 @@ class _SignUpPageState extends State<SignUpPage> {
     final returnimage = isSelfie == false
         ? await ImagePicker().pickImage(source: imageSource)
         : await ImagePicker().pickImage(
-            source: imageSource, preferredCameraDevice: CameraDevice.front);
+        source: imageSource, preferredCameraDevice: CameraDevice.front);
     if (returnimage == null) return null;
     CroppedFile? cropppedfile = await ImageCropper().cropImage(
       sourcePath: returnimage.path,
