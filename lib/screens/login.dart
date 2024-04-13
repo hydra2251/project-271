@@ -6,7 +6,8 @@ import 'package:http/http.dart';
 import 'package:project271/Designs/loadingdesign.dart';
 import 'package:project271/Designs/popupalert.dart';
 import 'package:project271/globalvariables.dart';
-import 'package:project271/screens/HomePage.dart';
+import 'package:project271/screens/ClientPage.dart';
+import 'package:project271/screens/NurseHomePage.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -158,8 +159,20 @@ Future<void> loginuserdatabase(
       prefs.setString('Username', usernamecontroller.text);
       prefs.setString('Token', responseData['token'].toString());
       prefs.setString('RoleId', responseData["roleId"].toString());
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const HomePage()));
+
+      if (responseData["roleId"] == 2) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const NurseHomePage()),
+          (Route<dynamic> route) => false,
+        );
+      } else {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const ClientPage()),
+          (Route<dynamic> route) => false,
+        );
+      }
     } else {
       Navigator.of(context, rootNavigator: true).pop();
       String error = response.body;

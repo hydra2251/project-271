@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project271/screens/login.dart';
 import 'package:project271/screens/signup_nurse.dart';
-import 'package:project271/screens/signup_user.dart';
 
 class ChooseSignUpOption extends StatelessWidget {
   const ChooseSignUpOption({super.key});
@@ -65,7 +64,7 @@ class ClientNursePage extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>  LoginPage()),
+                  MaterialPageRoute(builder: (context) => LoginPage()),
                 );
               },
               child: Container(

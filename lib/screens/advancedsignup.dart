@@ -18,7 +18,7 @@ Future<CroppedFile?> getCroppedFile(ImageSource imageSource,
     {bool isSelfie = false}) async {
   final pickedImage = isSelfie
       ? await ImagePicker().pickImage(
-      source: imageSource, preferredCameraDevice: CameraDevice.front)
+          source: imageSource, preferredCameraDevice: CameraDevice.front)
       : await ImagePicker().pickImage(source: imageSource);
 
   if (pickedImage == null) return null;
@@ -106,7 +106,6 @@ class _SignUpPageState extends State<SignUpPage> {
     'Oncology',
     'Pediatrics',
     'Geriatrics',
-    'Many',
   ];
 
   @override
@@ -158,7 +157,8 @@ class _SignUpPageState extends State<SignUpPage> {
         locationController.text.isNotEmpty &&
         nationalityController.text.isNotEmpty &&
         experienceController.text.isNotEmpty &&
-        expertiseController.text.isNotEmpty) {
+        expertiseController.text.isNotEmpty &&
+        bioController.text.isNotEmpty) {
       isStep1Completed = true;
     } else {
       isStep1Completed = false;
@@ -291,7 +291,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 onTap: () async {
                                   // Open a dropdown for selecting nationality
                                   final selectedNationality =
-                                  await showDialog<String>(
+                                      await showDialog<String>(
                                     context: context,
                                     builder: (BuildContext context) {
                                       return AlertDialog(
@@ -384,7 +384,6 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                             ),
                           ),
-
                           ListTile(
                             title: Semantics(
                               label: 'Expertise',
@@ -398,12 +397,12 @@ class _SignUpPageState extends State<SignUpPage> {
                                 onTap: () async {
                                   // Open a dropdown for selecting expertise
                                   final selectedExpertise =
-                                  await showDialog<String>(
+                                      await showDialog<String>(
                                     context: context,
                                     builder: (BuildContext context) {
                                       return AlertDialog(
                                         title:
-                                        const Text('Select your Expertise'),
+                                            const Text('Select your Expertise'),
                                         content: DropdownButton<String>(
                                           items: expertiseOptions
                                               .map((String value) {
@@ -448,11 +447,11 @@ class _SignUpPageState extends State<SignUpPage> {
                           ListTile(
                             leading: passportimage != null
                                 ? SizedBox(
-                              height: 150,
-                              width: 150,
-                              child:
-                              Image.file(File(passportimage!.path)),
-                            )
+                                    height: 150,
+                                    width: 150,
+                                    child:
+                                        Image.file(File(passportimage!.path)),
+                                  )
                                 : const SizedBox(),
                             title: TextButton.icon(
                               onPressed: () {
@@ -479,10 +478,10 @@ class _SignUpPageState extends State<SignUpPage> {
                           ListTile(
                             leading: idFrontImage != null
                                 ? SizedBox(
-                              height: 150,
-                              width: 150,
-                              child: Image.file(File(idFrontImage!.path)),
-                            )
+                                    height: 150,
+                                    width: 150,
+                                    child: Image.file(File(idFrontImage!.path)),
+                                  )
                                 : const SizedBox(),
                             title: TextButton.icon(
                               onPressed: () {
@@ -503,10 +502,10 @@ class _SignUpPageState extends State<SignUpPage> {
                           ListTile(
                             leading: idBackimage != null
                                 ? SizedBox(
-                              height: 150,
-                              width: 150,
-                              child: Image.file(File(idBackimage!.path)),
-                            )
+                                    height: 150,
+                                    width: 150,
+                                    child: Image.file(File(idBackimage!.path)),
+                                  )
                                 : const SizedBox(),
                             title: TextButton.icon(
                               onPressed: () {
@@ -716,14 +715,14 @@ class _SignUpPageState extends State<SignUpPage> {
     showModalBottomSheet(
         context: context,
         builder: (context) => Container(
-          height: 200,
-          color: Colors.blue,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 50),
-            child: Row(
-              children: [
-                Expanded(
-                    child: InkWell(
+              height: 200,
+              color: Colors.blue,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 50),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: InkWell(
                       onTap: () =>
                           pickimage(context, ImageSource.gallery, imagetype),
                       child: const SizedBox(
@@ -738,8 +737,8 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     )),
-                Expanded(
-                    child: InkWell(
+                    Expanded(
+                        child: InkWell(
                       onTap: () =>
                           pickimage(context, ImageSource.camera, imagetype),
                       child: const SizedBox(
@@ -754,10 +753,10 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     )),
-              ],
-            ),
-          ),
-        ));
+                  ],
+                ),
+              ),
+            ));
   }
 
   Future<void> pickimage(
@@ -785,7 +784,7 @@ class _SignUpPageState extends State<SignUpPage> {
     final returnimage = isSelfie == false
         ? await ImagePicker().pickImage(source: imageSource)
         : await ImagePicker().pickImage(
-        source: imageSource, preferredCameraDevice: CameraDevice.front);
+            source: imageSource, preferredCameraDevice: CameraDevice.front);
     if (returnimage == null) return null;
     CroppedFile? cropppedfile = await ImageCropper().cropImage(
       sourcePath: returnimage.path,

@@ -4,7 +4,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:project271/globalvariables.dart';
-import 'package:project271/screens/HomePage.dart';
+import 'package:project271/screens/ClientPage.dart';
+import 'package:project271/screens/NurseHomePage.dart';
 import 'package:project271/screens/choosesignupoption.dart';
 import 'package:project271/screens/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,8 +43,17 @@ class _LoadingState extends State<Loading> {
           },
         ).timeout(const Duration(seconds: 10));
         if (response.statusCode == 200) {
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const HomePage())); //
+          SharedPreferences preferences = await SharedPreferences.getInstance();
+          String RoleId = preferences.getString("RoleId").toString();
+          if (RoleId == "2") {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const NurseHomePage())); //
+          } else {
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const ClientPage())); //
+          }
         } else {
           Navigator.pushReplacement(
               context,

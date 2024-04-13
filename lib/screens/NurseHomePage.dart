@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:project271/screens/adminpage.dart';
 import 'package:project271/screens/advancedsignup.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+class NurseHomePage extends StatelessWidget {
+  const NurseHomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Profile'),
+        title: const Text('User Profile'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),

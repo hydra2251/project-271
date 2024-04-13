@@ -1,13 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:project271/screens/ClientPage.dart';
+import 'package:project271/screens/chooseavailabledates.dart';
+import 'package:project271/screens/loadingscreen.dart';
+import 'package:project271/screens/nurseadvancedinfo.dart';
 
 void main() {
   HttpOverrides.global = MyHttpOverrides();
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     routes: {
-      '/': (context) => const ClientPage(),
+      '/': (context) => const Loading(),
     },
   ));
 }

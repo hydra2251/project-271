@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:project271/globalvariables.dart';
+import 'package:project271/screens/nurseadvancedinfo.dart';
 
 class GetNurseFilter extends StatefulWidget {
-  final String? expertise;
+  final String expertise;
 
-  GetNurseFilter({Key? key, this.expertise}) : super(key: key);
+  GetNurseFilter({Key? key, required this.expertise}) : super(key: key);
 
   @override
   State<GetNurseFilter> createState() => _GetNurseFilterState();
@@ -21,7 +22,7 @@ class _GetNurseFilterState extends State<GetNurseFilter> {
   void initState() {
     super.initState();
     // Call the asynchronous operation and update the state when complete
-    getusersasync(widget.expertise).then((result) {
+    getnursefilterasync(widget.expertise).then((result) {
       setState(() {
         users = result;
         _foundUsers = result; // Initially display all users
@@ -35,7 +36,7 @@ class _GetNurseFilterState extends State<GetNurseFilter> {
       results = users;
     } else {
       results = users
-          .where((user) => user["firstname"]
+          .where((user) => user["firstName"]
               .toLowerCase()
               .contains(enteredKeyword.toLowerCase()))
           .toList();
@@ -71,21 +72,80 @@ class _GetNurseFilterState extends State<GetNurseFilter> {
             Expanded(
               child: _foundUsers.isNotEmpty
                   ? ListView.builder(
+                      shrinkWrap: true,
                       itemCount: _foundUsers.length,
-                      itemBuilder: (context, index) => Card(
-                        color: Colors.blue,
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        child: ListTile(
-                          title: Text(
-                            _foundUsers[index]["firstname"],
-                            style: const TextStyle(color: Colors.white),
+                      itemBuilder: (BuildContext context, int index) {
+                        final nurse = _foundUsers[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 16.0),
+                          child: Card(
+                            elevation: 3,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(16.0),
+                              leading: CircleAvatar(
+                                radius: 30,
+                                backgroundColor:
+                                    Colors.grey, // Default profile icon color
+                                backgroundImage: nurse['profile'] != null
+                                    ? MemoryImage(
+                                        base64Decode(
+                                            nurse['profile'].toString()),
+                                      )
+                                    : null,
+                                child: nurse['profile'] == null
+                                    ? const Icon(Icons.person,
+                                        color: Colors
+                                            .white) // Display the icon if profile is null
+                                    : null, // If profile is not null, display the image
+                              ),
+                              title: Text(
+                                '${nurse['firstName']} ${nurse['lastName']}',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 8.0),
+                                  Text(
+                                    'Expertise: ${nurse['expertise']}',
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  Text(
+                                    'Location: ${nurse['location']}',
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  Text(
+                                    'Phone Number: ${nurse['phoneNumber']}',
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  Text(
+                                    'Email: ${nurse['email']}',
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => NurseAdvancedInfo(
+                                          userid: nurse["nurseId"])),
+                                );
+                              },
+                            ),
                           ),
-                          subtitle: Text(
-                            _foundUsers[index]["lastname"],
-                            style: const TextStyle(color: Colors.white70),
-                          ),
-                        ),
-                      ),
+                        );
+                      },
                     )
                   : const Center(
                       child: Text(
@@ -101,10 +161,11 @@ class _GetNurseFilterState extends State<GetNurseFilter> {
   }
 }
 
-Future<List<dynamic>> getusersasync(String? expertise) async {
+Future<List<dynamic>> getnursefilterasync(String expertise,
+    {bool isclientpage = false}) async {
   try {
     final Uri url = Uri.parse(
-        "${GlobalVariables.apilink}/User/getavailableexpertise?expertise=$expertise");
+        "${GlobalVariables.apilink}/User/getavailableexpertise?expertise=$expertise&Isclientpage=$isclientpage");
     var response = await http.get(
       url,
       headers: {"Content-Type": "application/json"},
