@@ -66,6 +66,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  late Future<dynamic>? nurseadvancedinfo;
   int currentStep = 1;
   bool isStep1Completed = false;
   bool isStep2Completed = false;
@@ -121,6 +122,35 @@ class _SignUpPageState extends State<SignUpPage> {
     hourlyPriceController = TextEditingController();
     dailyPriceController = TextEditingController();
     weeklyPriceController = TextEditingController();
+    someFunction();
+  }
+
+  void someFunction() async {
+    dynamic nurseadvancedinfo = await getnursesignupadvancedinfo();
+    if (nurseadvancedinfo != null) {
+      dobController.text = nurseadvancedinfo["dateofBirth"].toString() ?? '';
+      nationalityController.text =
+          nurseadvancedinfo["nationality"].toString() ?? '';
+      locationController.text = nurseadvancedinfo["location"].toString() ?? '';
+      bioController.text = nurseadvancedinfo["bio"].toString() ?? '';
+      experienceController.text =
+          nurseadvancedinfo["yearsOfExperience"].toString() ?? '';
+      expertiseController.text =
+          nurseadvancedinfo["expertise"].toString() ?? '';
+      hourlyPriceController.text =
+          nurseadvancedinfo["hourlyPrice"]?.toString() ?? '';
+      dailyPriceController.text =
+          nurseadvancedinfo["dailyPrice"]?.toString() ?? '';
+      weeklyPriceController.text =
+          nurseadvancedinfo["weeklyPrice"]?.toString() ?? '';
+      passportbase64 = nurseadvancedinfo["passportimage"];
+      idbackimagebase64 = nurseadvancedinfo["idBackImage"];
+      idfrontimagebase64 = nurseadvancedinfo["idFrontImage"];
+      isStep1Completed = true;
+      isStep2Completed = true;
+      isStep3Completed = true;
+      setState(() {});
+    }
   }
 
   @override
@@ -168,16 +198,20 @@ class _SignUpPageState extends State<SignUpPage> {
   void checkIfStep2IsComplete() {
     // Step 2 is considered complete if the passport image is not null, OR both ID front and back images are not null.
     // If only one of the ID images is uploaded, the user is required to upload the other one.
-    if (passportimage != null) {
+    if (passportbase64 != null) {
       isStep2Completed = true;
     }
-    if (passportimage != null && idFrontImage == null && idBackimage != null) {
+    if (passportbase64 != null &&
+        idfrontimagebase64 == null &&
+        idbackimagebase64 != null) {
       isStep2Completed = false;
     }
-    if (passportimage != null && idFrontImage != null && idBackimage == null) {
+    if (passportbase64 != null &&
+        idfrontimagebase64 != null &&
+        idbackimagebase64 == null) {
       isStep2Completed = false;
     }
-    if (idFrontImage != null && idBackimage != null) {
+    if (idfrontimagebase64 != null && idbackimagebase64 != null) {
       isStep2Completed = true;
     }
   }
@@ -445,12 +479,12 @@ class _SignUpPageState extends State<SignUpPage> {
                         childrenPadding: EdgeInsets.zero,
                         children: [
                           ListTile(
-                            leading: passportimage != null
+                            leading: passportbase64 != null
                                 ? SizedBox(
                                     height: 150,
                                     width: 150,
-                                    child:
-                                        Image.file(File(passportimage!.path)),
+                                    child: Image.memory(
+                                        base64Decode(passportbase64!)),
                                   )
                                 : const SizedBox(),
                             title: TextButton.icon(
@@ -476,11 +510,12 @@ class _SignUpPageState extends State<SignUpPage> {
                             },
                           ),
                           ListTile(
-                            leading: idFrontImage != null
+                            leading: idfrontimagebase64 != null
                                 ? SizedBox(
                                     height: 150,
                                     width: 150,
-                                    child: Image.file(File(idFrontImage!.path)),
+                                    child: Image.memory(
+                                        base64Decode(idfrontimagebase64!)),
                                   )
                                 : const SizedBox(),
                             title: TextButton.icon(
@@ -500,11 +535,12 @@ class _SignUpPageState extends State<SignUpPage> {
                             },
                           ),
                           ListTile(
-                            leading: idBackimage != null
+                            leading: idbackimagebase64 != null
                                 ? SizedBox(
                                     height: 150,
                                     width: 150,
-                                    child: Image.file(File(idBackimage!.path)),
+                                    child: Image.memory(
+                                        base64Decode(idbackimagebase64!)),
                                   )
                                 : const SizedBox(),
                             title: TextButton.icon(
@@ -556,7 +592,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         children: [
                           ListTile(
                             title: Semantics(
-                              label: 'Hourly Price',
+                              label: 'Hourly Price in USD',
                               hint: 'Enter your hourly price',
                               child: TextField(
                                 controller: hourlyPriceController,
@@ -579,7 +615,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                           ListTile(
                             title: Semantics(
-                              label: 'Daily Price',
+                              label: 'Daily Price in USD',
                               hint: 'Enter your daily price',
                               child: TextField(
                                 controller: dailyPriceController,
@@ -602,7 +638,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                           ListTile(
                             title: Semantics(
-                              label: 'Weekly Price',
+                              label: 'Weekly Price in USD',
                               hint: 'Enter your weekly price',
                               child: TextField(
                                 controller: weeklyPriceController,
@@ -657,15 +693,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void uploadadvancedinfo() async {
     showLoadingDialog(context, true);
-    if (passportimage != null) {
-      passportbase64 = convertimagetobase64(passportimage);
-    }
-    if (idFrontImage != null) {
-      idfrontimagebase64 = convertimagetobase64(passportimage);
-    }
-    if (idBackimage != null) {
-      idbackimagebase64 = convertimagetobase64(passportimage);
-    }
+
     try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       Uri url = Uri.parse("${GlobalVariables.apilink}/User/uploadadvancedinfo");
@@ -679,7 +707,7 @@ class _SignUpPageState extends State<SignUpPage> {
         "expertise": expertiseController.text,
         "passportimage": passportbase64,
         "idFrontImage": idfrontimagebase64,
-        "idBackImage": passportbase64,
+        "idBackImage": idbackimagebase64,
         "hourlyPrice": double.tryParse(hourlyPriceController.text),
         "dailyPrice": double.tryParse(dailyPriceController.text),
         "weeklyPrice": double.tryParse(weeklyPriceController.text)
@@ -697,6 +725,30 @@ class _SignUpPageState extends State<SignUpPage> {
       Navigator.of(context, rootNavigator: true).pop();
       showalert(
           context, "The request timed out. Please try again.", AlertType.error);
+    } catch (e) {
+      Navigator.of(context, rootNavigator: true).pop();
+      print(e);
+      showalert(context, "Application Encountered an Unhandled Exception",
+          AlertType.error);
+    }
+  }
+
+  Future<dynamic>? getnursesignupadvancedinfo() async {
+    try {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      int? nurseid = int.tryParse(preferences.getString("UserId").toString());
+
+      Uri url = Uri.parse(
+          "${GlobalVariables.apilink}/User/getnursesignupadvancedinfo?userid=$nurseid");
+      Response response = await get(
+        url,
+        headers: {"Content-Type": "application/json"},
+      ).timeout(const Duration(seconds: 10));
+      if ((response.statusCode == 200)) {
+        return jsonDecode(response.body);
+      }
+    } on TimeoutException catch (_) {
+      return null;
     } catch (e) {
       Navigator.of(context, rootNavigator: true).pop();
       print(e);
@@ -767,13 +819,13 @@ class _SignUpPageState extends State<SignUpPage> {
       return;
     }
     if (imagetype == 0) {
-      passportimage = file;
+      passportbase64 = convertimagetobase64(file);
     }
     if (imagetype == 1) {
-      idFrontImage = file;
+      idfrontimagebase64 = convertimagetobase64(file);
     }
     if (imagetype == 2) {
-      idBackimage = file;
+      idbackimagebase64 = convertimagetobase64(file);
     }
     checkIfStep2IsComplete();
     setState(() {});

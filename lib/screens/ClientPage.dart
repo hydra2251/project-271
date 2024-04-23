@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:project271/screens/ClientProfile.dart';
+import 'package:project271/screens/about_us.dart';
 import 'package:project271/screens/getfilternurse.dart';
 import 'package:project271/screens/nurseadvancedinfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,10 +38,6 @@ class _ClientPageState extends State<ClientPage> {
       appBar: AppBar(
         title: const Text('Hire My Nurse'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {},
-          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
@@ -92,9 +89,12 @@ class _ClientPageState extends State<ClientPage> {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.view_list),
+              icon: const Icon(Icons.info),
               onPressed: () {
-                // Navigate to view list page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AboutUs()),
+                );
               },
             ),
           ],
@@ -139,12 +139,18 @@ class _ClientPageState extends State<ClientPage> {
           child: GridView.count(
             crossAxisCount: 3,
             children: [
-              _buildCategory('Cardiology', 'lib/assets/nursesicon.png'),
-              _buildCategory('Orthopedics', 'lib/assets/nursesicon.png'),
-              _buildCategory('Neurology', 'lib/assets/nursesicon.png'),
-              _buildCategory('Oncology', 'lib/assets/nursesicon.png'),
-              _buildCategory('Pediatrics', 'lib/assets/nursesicon.png'),
-              _buildCategory('Geriatrics', 'lib/assets/nursesicon.png'),
+              _buildCategory('Cardiology',
+                  'https://media.istockphoto.com/id/1195893397/vector/cardiologist-listens-to-a-heartbeat-healthy-heart-cardiology.jpg?s=612x612&w=0&k=20&c=F0nchkkQ0yhr4tTQ53HdiHGGpu6gcE-bhp2xBaaCYwY='),
+              _buildCategory('Orthopedics',
+                  'https://media.istockphoto.com/id/1427353081/vector/nurse-or-physician-helps-patient-with-broken-leg-to-walk-doctor-comforts-injured-person-on.jpg?s=612x612&w=0&k=20&c=N7aK0UQFqzt68ri0N5ZAD21OldVJSPtCkn_oNFLZQso='),
+              _buildCategory('Neurology',
+                  'https://media.istockphoto.com/id/1094381118/vector/neuroscientists-with-a-giant-chart-of-human-brain-and-a-heart-icon.jpg?s=612x612&w=0&k=20&c=qFBTS7O09utfJ1GnVF26VHsTVG_zQK68PW9p7jIFRQM='),
+              _buildCategory('Oncology',
+                  'https://media.istockphoto.com/id/1320094034/vector/cancer-therapy-concept-doctor-give-advice-support-motivation-woman-patient-with-cartoon-flat.jpg?s=612x612&w=0&k=20&c=ak0WFPBH8rurbm6mUwS7zQ1DOdeg6hq8hjRdqzuf5Xc='),
+              _buildCategory('Pediatrics',
+                  'https://static.vecteezy.com/system/resources/previews/002/144/075/original/nurse-helping-sick-child-pediatric-patient-hospital-cartoon-vector.jpg'),
+              _buildCategory('Geriatrics',
+                  'https://static.vecteezy.com/system/resources/previews/001/830/100/non_2x/grandpa-and-nurse-male-staff-doctors-and-elderly-people-free-vector.jpg')
             ],
           ),
         ),
@@ -181,7 +187,7 @@ class _ClientPageState extends State<ClientPage> {
     );
   }
 
-  Widget _buildCategory(String title, String imagePath) {
+  Widget _buildCategory(String title, String imageURL) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -192,8 +198,8 @@ class _ClientPageState extends State<ClientPage> {
       },
       child: Column(
         children: [
-          Image.asset(
-            imagePath,
+          Image.network(
+            imageURL,
             height: 100.0,
             width: 100.0,
           ),

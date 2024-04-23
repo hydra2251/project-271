@@ -241,7 +241,7 @@ class _NurseAdvancedInfoState extends State<NurseAdvancedInfo> {
                       Text(
                         'Bio : ${userinfo["bio"].toString()}  ',
                         style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 11, fontWeight: FontWeight.bold),
                         softWrap: true,
                       ),
                       const SizedBox(
@@ -280,58 +280,49 @@ class _NurseAdvancedInfoState extends State<NurseAdvancedInfo> {
                         height: 30,
                       ),
                       const Text(
-                        "Hourly Price ",
+                        "Hourly Price in USD ",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(
                         height: 10,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 200.0),
-                        child: Text(
-                          userinfo["hourlyPrice"].toString(),
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
+                      Text(
+                        userinfo["hourlyPrice"].toString(),
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(
                         height: 30,
                       ),
                       const Text(
-                        "Daily Price ",
+                        "Daily Price in USD ",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(
                         height: 10,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 200.0),
-                        child: Text(
-                          userinfo["dailyPrice"].toString(),
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
+                      Text(
+                        userinfo["dailyPrice"].toString(),
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(
                         height: 30,
                       ),
                       const Text(
-                        "Weekly Price ",
+                        "Weekly Price in USD",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(
                         height: 10,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 200.0),
-                        child: Text(
-                          userinfo["weeklyPrice"].toString(),
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
+                      Text(
+                        userinfo["weeklyPrice"].toString(),
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(
                         height: 20,

@@ -9,7 +9,9 @@ import 'package:project271/globalvariables.dart';
 import 'package:project271/screens/adminpage.dart';
 import 'package:project271/screens/advancedsignup.dart';
 import 'package:project271/screens/chooseavailabledates.dart';
+import 'package:project271/screens/choosesignupoption.dart';
 import 'package:project271/screens/login.dart';
+import 'package:project271/screens/nurseadvancedinfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ClientProfile extends StatefulWidget {
@@ -43,7 +45,7 @@ class _ClientProfileState extends State<ClientProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Client Profile'),
+        title: const Text("Profile"),
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(30.0, 40.0, 30.0, 0),
@@ -186,55 +188,30 @@ class _ClientProfileState extends State<ClientProfile> {
             const SizedBox(
               height: 10,
             ),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ChooseAvailableDates()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  fixedSize: const Size.fromWidth(200),
-                  backgroundColor: Colors.blue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                ),
-                child: const Text(
-                  'Choose Available Dates',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-            ),
             if (RoleId == '0')
-              const SizedBox(
-                height: 10,
-              ),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AdminPage()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  fixedSize: const Size.fromWidth(200),
-                  backgroundColor: Colors.blue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AdminPage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    fixedSize: const Size.fromWidth(200),
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                ),
-                child: const Text(
-                  'Admin Page',
-                  style: TextStyle(fontSize: 16),
+                  child: const Text(
+                    'Admin Page',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -379,8 +356,7 @@ void logout(BuildContext context) async {
   preferences.clear();
   Navigator.pushAndRemoveUntil(
     context,
-    MaterialPageRoute(builder: (context) => LoginPage()),
-    (Route<dynamic> route) =>
-        false, // This predicate will remove all routes from the stack
+    MaterialPageRoute(builder: (context) => ChooseSignUpOption()),
+    (Route<dynamic> route) => false,
   );
 }
