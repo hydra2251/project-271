@@ -232,7 +232,7 @@ class _ClientPageState extends State<ClientPage> {
                 radius: 30,
                 backgroundColor: Colors.grey,
                 backgroundImage: nurse['profile'] != null
-                    ? MemoryImage(base64Decode(nurse['profile'].toString()))
+                    ? NetworkImage(nurse['profile']!)
                     : null,
                 child: nurse['profile'] == null
                     ? const Icon(Icons.person, color: Colors.white)

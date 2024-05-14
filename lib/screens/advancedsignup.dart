@@ -47,6 +47,7 @@ class AdvancedSignUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: SignUpPage(
         goBack: () {
           Navigator.pop(context);
@@ -99,6 +100,9 @@ class _SignUpPageState extends State<SignUpPage> {
   String? passportbase64;
   String? idfrontimagebase64;
   String? idbackimagebase64;
+  String? passportonline;
+  String? idfrontonline;
+  String? idbackonline;
 
   List<String> expertiseOptions = [
     'Cardiology',
@@ -143,9 +147,9 @@ class _SignUpPageState extends State<SignUpPage> {
           nurseadvancedinfo["dailyPrice"]?.toString() ?? '';
       weeklyPriceController.text =
           nurseadvancedinfo["weeklyPrice"]?.toString() ?? '';
-      passportbase64 = nurseadvancedinfo["passportimage"];
-      idbackimagebase64 = nurseadvancedinfo["idBackImage"];
-      idfrontimagebase64 = nurseadvancedinfo["idFrontImage"];
+      passportonline = nurseadvancedinfo["passportimage"];
+      idbackonline = nurseadvancedinfo["idBackImage"];
+      idfrontonline = nurseadvancedinfo["idFrontImage"];
       isStep1Completed = true;
       isStep2Completed = true;
       isStep3Completed = true;
@@ -403,6 +407,9 @@ class _SignUpPageState extends State<SignUpPage> {
                               label: 'Bio',
                               hint: 'Tell us about you',
                               child: TextField(
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(300),
+                                ],
                                 controller: bioController,
                                 maxLines: null,
                                 decoration: const InputDecoration(
@@ -486,7 +493,13 @@ class _SignUpPageState extends State<SignUpPage> {
                                     child: Image.memory(
                                         base64Decode(passportbase64!)),
                                   )
-                                : const SizedBox(),
+                                : passportonline != null
+                                    ? SizedBox(
+                                        height: 150,
+                                        width: 150,
+                                        child: Image.network(passportonline!),
+                                      )
+                                    : const SizedBox(),
                             title: TextButton.icon(
                               onPressed: () {
                                 showImagePickerOption(
@@ -517,7 +530,13 @@ class _SignUpPageState extends State<SignUpPage> {
                                     child: Image.memory(
                                         base64Decode(idfrontimagebase64!)),
                                   )
-                                : const SizedBox(),
+                                : idfrontonline != null
+                                    ? SizedBox(
+                                        height: 150,
+                                        width: 150,
+                                        child: Image.network(idfrontonline!),
+                                      )
+                                    : const SizedBox(),
                             title: TextButton.icon(
                               onPressed: () {
                                 showImagePickerOption(context, 1);
@@ -542,7 +561,13 @@ class _SignUpPageState extends State<SignUpPage> {
                                     child: Image.memory(
                                         base64Decode(idbackimagebase64!)),
                                   )
-                                : const SizedBox(),
+                                : idbackonline != null
+                                    ? SizedBox(
+                                        height: 150,
+                                        width: 150,
+                                        child: Image.network(idbackonline!),
+                                      )
+                                    : const SizedBox(),
                             title: TextButton.icon(
                               onPressed: () {
                                 showImagePickerOption(context, 2);
@@ -705,9 +730,12 @@ class _SignUpPageState extends State<SignUpPage> {
         "yearsOfExperience": experienceController.text,
         "bio": bioController.text,
         "expertise": expertiseController.text,
-        "passportimage": passportbase64,
-        "idFrontImage": idfrontimagebase64,
-        "idBackImage": idbackimagebase64,
+        "passportimage":
+            passportbase64 != null ? passportbase64 : passportonline,
+        "idFrontImage":
+            idfrontimagebase64 != null ? idfrontimagebase64 : idfrontonline,
+        "idBackImage":
+            idbackimagebase64 != null ? idbackimagebase64 : idbackonline,
         "hourlyPrice": double.tryParse(hourlyPriceController.text),
         "dailyPrice": double.tryParse(dailyPriceController.text),
         "weeklyPrice": double.tryParse(weeklyPriceController.text)
@@ -716,7 +744,7 @@ class _SignUpPageState extends State<SignUpPage> {
         url,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(userData),
-      ).timeout(const Duration(minutes: 1));
+      ).timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
         showalert(context, "Advanced Info Uploaded", AlertType.success);
@@ -743,7 +771,7 @@ class _SignUpPageState extends State<SignUpPage> {
       Response response = await get(
         url,
         headers: {"Content-Type": "application/json"},
-      ).timeout(const Duration(seconds: 10));
+      ).timeout(const Duration(seconds: 20));
       if ((response.statusCode == 200)) {
         return jsonDecode(response.body);
       }
@@ -757,8 +785,14 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
-  String convertimagetobase64(CroppedFile? croppedFile) {
+  String convertCroppedimagetobase64(CroppedFile? croppedFile) {
     Uint8List image = File(croppedFile!.path).readAsBytesSync();
+    String base64string = base64Encode(image);
+    return base64string;
+  }
+
+  String convertNetworkimagetobase64(File imagenetwork) {
+    Uint8List image = File(imagenetwork.path).readAsBytesSync();
     String base64string = base64Encode(image);
     return base64string;
   }
@@ -819,14 +853,15 @@ class _SignUpPageState extends State<SignUpPage> {
       return;
     }
     if (imagetype == 0) {
-      passportbase64 = convertimagetobase64(file);
+      passportbase64 = convertCroppedimagetobase64(file);
     }
     if (imagetype == 1) {
-      idfrontimagebase64 = convertimagetobase64(file);
+      idfrontimagebase64 = convertCroppedimagetobase64(file);
     }
     if (imagetype == 2) {
-      idbackimagebase64 = convertimagetobase64(file);
+      idbackimagebase64 = convertCroppedimagetobase64(file);
     }
+    Navigator.pop(context);
     checkIfStep2IsComplete();
     setState(() {});
   }

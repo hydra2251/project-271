@@ -25,6 +25,7 @@ class _ClientProfileState extends State<ClientProfile> {
   Map<String, dynamic> userinfo = {};
   CroppedFile? profilepicture;
   String? RoleId;
+  String? base64stringptofilepicture;
 
   @override
   void initState() {
@@ -66,15 +67,19 @@ class _ClientProfileState extends State<ClientProfile> {
                       child: CircleAvatar(
                         radius: 30,
                         backgroundColor: Colors.grey,
-                        backgroundImage: userinfo['profile'] != null
-                            ? MemoryImage(
-                                base64Decode(userinfo['profile'].toString()))
-                            : null,
-                        child: userinfo['profile'] == null
+                        backgroundImage: base64stringptofilepicture != null
+                            ? Image.memory(
+                                base64Decode(base64stringptofilepicture!),
+                              ).image
+                            : userinfo['profile'] != null
+                                ? NetworkImage(userinfo['profile']!)
+                                : null,
+                        child: (base64stringptofilepicture == null &&
+                                userinfo['profile'] == null)
                             ? const Icon(
                                 Icons.person,
                                 color: Colors.white,
-                                size: 40,
+                                size: 60,
                               )
                             : null,
                       ),
@@ -96,6 +101,7 @@ class _ClientProfileState extends State<ClientProfile> {
                   onPressed: () {
                     setState(() {
                       userinfo['profile'] = null;
+                      base64stringptofilepicture = null;
                       deleteprofilepicture();
                     });
                   },
@@ -250,9 +256,10 @@ class _ClientProfileState extends State<ClientProfile> {
     );
     Navigator.pop(context);
     if (croppedfile == null) return null;
+    userinfo["profile"] = convertImageToBase64(croppedfile);
     setState(() {
-      userinfo["profile"] = convertImageToBase64(croppedfile);
       uploadprofilepicture(userinfo["profile"]);
+      base64stringptofilepicture = userinfo["profile"];
     });
   }
 

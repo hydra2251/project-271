@@ -38,7 +38,7 @@ class _NurseHomePageState extends State<NurseHomePage> {
           Container(
             width: double.infinity,
             color: Color.fromRGBO(27, 149, 187, 1.0),
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(0.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

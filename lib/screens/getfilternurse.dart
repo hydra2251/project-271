@@ -91,10 +91,7 @@ class _GetNurseFilterState extends State<GetNurseFilter> {
                                 backgroundColor:
                                     Colors.grey, // Default profile icon color
                                 backgroundImage: nurse['profile'] != null
-                                    ? MemoryImage(
-                                        base64Decode(
-                                            nurse['profile'].toString()),
-                                      )
+                                    ? NetworkImage(nurse['profile']!)
                                     : null,
                                 child: nurse['profile'] == null
                                     ? const Icon(Icons.person,

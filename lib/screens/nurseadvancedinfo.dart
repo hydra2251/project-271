@@ -86,8 +86,7 @@ class _NurseAdvancedInfoState extends State<NurseAdvancedInfo> {
                             radius: 50,
                             backgroundColor: Colors.transparent,
                             backgroundImage: userinfo['profilePicture'] != null
-                                ? MemoryImage(base64Decode(
-                                    userinfo['profilePicture'].toString()))
+                                ? NetworkImage(userinfo['profilePicture']!)
                                 : null,
                             child: userinfo['profilePicture'] == null
                                 ? const Icon(
@@ -163,7 +162,23 @@ class _NurseAdvancedInfoState extends State<NurseAdvancedInfo> {
                           fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(
-                      height: 70,
+                      height: 50,
+                    ),
+                    const Text(
+                      "Expertise",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      userinfo["expertise"].toString(),
+                      style: const TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      height: 20,
                     ),
                     const Text(
                       "Personal Info",
@@ -223,7 +238,7 @@ class _NurseAdvancedInfoState extends State<NurseAdvancedInfo> {
               child: Container(
                 color: const Color(0xFFE9F3F5),
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
+                  padding: const EdgeInsets.only(top: 0.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -241,7 +256,7 @@ class _NurseAdvancedInfoState extends State<NurseAdvancedInfo> {
                       Text(
                         'Bio : ${userinfo["bio"].toString()}  ',
                         style: const TextStyle(
-                            fontSize: 11, fontWeight: FontWeight.bold),
+                            fontSize: 12, fontWeight: FontWeight.bold),
                         softWrap: true,
                       ),
                       const SizedBox(
